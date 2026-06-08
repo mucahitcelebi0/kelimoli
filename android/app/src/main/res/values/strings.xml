@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Kelimoli</string>
+    <string name="title_activity_main">Kelimoli</string>
+    <string name="package_name">com.kelimoli.app</string>
+    <string name="custom_url_scheme">com.kelimoli.app</string>
+</resources>

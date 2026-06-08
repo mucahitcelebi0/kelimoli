@@ -1,0 +1,27 @@
+{
+  "name": "kelimoli",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Kelimoli — İngilizce Kelime Akademisi (Türkçe→İngilizce öğrenme uygulaması)",
+  "scripts": {
+    "sync:web": "node scripts/sync-web.js",
+    "cap:copy": "npm run sync:web && cap copy android",
+    "cap:open": "cap open android",
+    "android": "npm run cap:copy && npm run cap:open"
+  },
+  "dependencies": {
+    "@capacitor-community/admob": "^6.2.0",
+    "@capacitor-community/text-to-speech": "^5.1.0",
+    "@capacitor/android": "^6.1.2",
+    "@capacitor/app": "^6.0.3",
+    "@capacitor/core": "^6.1.2",
+    "@capacitor/haptics": "^6.0.3",
+    "@capacitor/ios": "^6.2.1",
+    "@capacitor/local-notifications": "^6.1.3",
+    "@revenuecat/purchases-capacitor": "^9.2.2"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^6.1.2"
+  }
+}

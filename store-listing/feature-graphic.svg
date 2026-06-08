@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 500" width="1024" height="500">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1E3A8A"/>
+      <stop offset="100%" stop-color="#0F172A"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#B45309"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.3" cy="0.5" r="0.55">
+      <stop offset="0%" stop-color="#3B5BC6" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#1E3A8A" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1024" height="500" fill="url(#bg)"/>
+  <rect width="1024" height="500" fill="url(#glow)"/>
+
+  <!-- Subtle floating decorative words (English vocab hint) -->
+  <g font-family="Georgia, 'Playfair Display', serif" fill="#FAF8F3" opacity="0.06" font-style="italic">
+    <text x="60"  y="80"  font-size="32" font-weight="500">vocabulary</text>
+    <text x="780" y="60"  font-size="28" font-weight="500">fluency</text>
+    <text x="650" y="450" font-size="30" font-weight="500">remember</text>
+    <text x="80"  y="450" font-size="26" font-weight="500">practice</text>
+    <text x="450" y="100" font-size="22" font-weight="500">learn</text>
+    <text x="900" y="280" font-size="24" font-weight="500">grow</text>
+  </g>
+
+  <!-- Left: app icon mark (200x200, centered vertically) -->
+  <g transform="translate(90, 150)">
+    <rect width="200" height="200" rx="44" fill="#0F172A" stroke="#1E3A8A" stroke-width="2"/>
+    <circle cx="153" cy="48" r="9" fill="url(#gold)" opacity="0.95"/>
+    <text x="100" y="143"
+          font-family="Georgia, 'Playfair Display', serif"
+          font-size="130"
+          font-weight="800"
+          text-anchor="middle"
+          fill="#FAF8F3"
+          letter-spacing="-3">K</text>
+  </g>
+
+  <!-- Vertical divider -->
+  <line x1="340" y1="160" x2="340" y2="340" stroke="url(#gold)" stroke-width="2" opacity="0.5"/>
+
+  <!-- Right: wordmark + tagline -->
+  <g transform="translate(380, 0)">
+    <text x="0" y="225"
+          font-family="Georgia, 'Playfair Display', serif"
+          font-size="88"
+          font-weight="800"
+          fill="#FAF8F3"
+          letter-spacing="-2">Kelimoli</text>
+
+    <!-- Tagline TR -->
+    <text x="0" y="275"
+          font-family="-apple-system, 'Segoe UI', sans-serif"
+          font-size="22"
+          font-weight="500"
+          fill="#A6ACB8"
+          letter-spacing="0.5">İngilizce Kelime Akademisi</text>
+
+    <!-- Underline accent -->
+    <rect x="0" y="295" width="60" height="3" fill="url(#gold)" rx="1.5"/>
+
+    <!-- Subline features -->
+    <text x="0" y="345"
+          font-family="-apple-system, 'Segoe UI', sans-serif"
+          font-size="20"
+          font-weight="600"
+          fill="#FAF8F3"
+          opacity="0.92">A1'den B2'ye · 3000+ kelime · sınav modu</text>
+  </g>
+</svg>

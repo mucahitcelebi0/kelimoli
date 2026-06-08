@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3B5BDB"/>
+      <stop offset="55%" stop-color="#1E3A8A"/>
+      <stop offset="100%" stop-color="#0A1429"/>
+    </linearGradient>
+
+    <linearGradient id="glassHighlight" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.18"/>
+      <stop offset="50%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+
+    <linearGradient id="earNavy" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7DA0FF"/>
+      <stop offset="50%" stop-color="#4F6EE5"/>
+      <stop offset="100%" stop-color="#1E3A8A"/>
+    </linearGradient>
+
+    <linearGradient id="earInnerNavy" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#B8CCFF"/>
+      <stop offset="100%" stop-color="#5273E0"/>
+    </linearGradient>
+
+    <filter id="textShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="14"/>
+      <feOffset dx="0" dy="6" result="offsetblur"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.45"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="earGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1024" height="1024" rx="224" fill="url(#bg)"/>
+  <rect width="1024" height="1024" rx="224" fill="url(#glassHighlight)"/>
+
+  <!-- TAVŞAN KULAKLARI - K'nin sağ ÜST SERİF köşesine DOKUNUYOR -->
+  <g transform="translate(660, 295)" filter="url(#earGlow)">
+    <g transform="rotate(-12 -7 -55)">
+      <ellipse cx="-7" cy="-55" rx="14" ry="55"
+               fill="url(#earNavy)"
+               stroke="#FAF8F3" stroke-width="3" stroke-opacity="0.9"/>
+      <ellipse cx="-7" cy="-60" rx="7" ry="40"
+               fill="url(#earInnerNavy)" opacity="0.9"/>
+    </g>
+    <g transform="rotate(12 7 -55)">
+      <ellipse cx="7" cy="-55" rx="14" ry="55"
+               fill="url(#earNavy)"
+               stroke="#FAF8F3" stroke-width="3" stroke-opacity="0.9"/>
+      <ellipse cx="7" cy="-60" rx="7" ry="40"
+               fill="url(#earInnerNavy)" opacity="0.9"/>
+    </g>
+  </g>
+
+  <text x="512" y="720"
+        font-family="Georgia, 'Playfair Display', serif"
+        font-size="640"
+        font-weight="800"
+        text-anchor="middle"
+        fill="#FAF8F3"
+        letter-spacing="-16"
+        filter="url(#textShadow)">K</text>
+</svg>

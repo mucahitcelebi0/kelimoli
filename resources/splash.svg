@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2732 2732" width="2732" height="2732">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F6F4EE"/>
+      <stop offset="100%" stop-color="#EDE6D3"/>
+    </linearGradient>
+    <linearGradient id="logo-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1E3A8A"/>
+      <stop offset="100%" stop-color="#0F172A"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#B45309"/>
+    </linearGradient>
+  </defs>
+  <rect width="2732" height="2732" fill="url(#bg)"/>
+  <!-- Merkezdeki logo (ikondan büyütülmüş) -->
+  <g transform="translate(866 866)">
+    <rect width="1000" height="1000" rx="220" fill="url(#logo-bg)"/>
+    <circle cx="750" cy="250" r="44" fill="url(#gold)" opacity="0.95"/>
+    <text x="500" y="700"
+          font-family="Georgia, 'Playfair Display', serif"
+          font-size="640"
+          font-weight="800"
+          text-anchor="middle"
+          fill="#FAF8F3"
+          letter-spacing="-16">K</text>
+  </g>
+  <!-- Marka adı -->
+  <text x="1366" y="2100"
+        font-family="Georgia, 'Playfair Display', serif"
+        font-size="148"
+        font-weight="700"
+        text-anchor="middle"
+        fill="#0F172A"
+        letter-spacing="2">Kelimoli</text>
+  <text x="1366" y="2200"
+        font-family="-apple-system, 'Inter', sans-serif"
+        font-size="56"
+        font-weight="500"
+        text-anchor="middle"
+        fill="#475569"
+        letter-spacing="6">İNGİLİZCE KELİME AKADEMİSİ</text>
+</svg>

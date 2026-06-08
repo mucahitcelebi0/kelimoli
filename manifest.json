@@ -1,0 +1,27 @@
+{
+  "name": "Kelimoli — İngilizce Kelime Akademisi",
+  "short_name": "Kelimoli",
+  "description": "Türkçeden İngilizceye kelime öğren — film sahneleri, oyunlar ve aralıklı tekrarla.",
+  "lang": "tr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F0EBDD",
+  "theme_color": "#0F172A",
+  "categories": ["education", "games"],
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

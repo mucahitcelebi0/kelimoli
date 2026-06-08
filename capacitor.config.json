@@ -1,0 +1,12 @@
+{
+  "appId": "com.kelimoli.app",
+  "appName": "Kelimoli",
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": false,
+    "backgroundColor": "#F0EBDD"
+  },
+  "server": {
+    "androidScheme": "https"
+  }
+}

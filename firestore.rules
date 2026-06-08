@@ -1,0 +1,28 @@
+rules_version = '2';
+
+// =====================================================================
+// Kelimoli — Firestore Güvenlik Kuralları
+// Bu dosya REFERANS amaçlıdır. Gerçek kurallar Firebase Console'da yayınlanır:
+//   https://console.firebase.google.com/project/kelimoli/firestore/rules
+// Değişiklik yaparsan hem burayı hem Console'u güncel tut.
+// =====================================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Kullanıcı ilerleme dökümanı (XP, streak, wordStats, achievements, ...)
+    // Sadece sahibi okuyup yazabilir — verisi gizli kalır.
+    match /users/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // Haftalık leaderboard entry'leri.
+    // Veri yolu: leaderboards/{weekId}/entries/{uid}
+    //  - Giriş yapan HERKES okur (sıralamayı görmek için).
+    //  - Herkes SADECE kendi entry'sini yazar (başkasının skoru korunur).
+    match /leaderboards/{weekId}/entries/{uid} {
+      allow read:  if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == uid;
+    }
+  }
+}
