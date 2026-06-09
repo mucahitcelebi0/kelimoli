@@ -26,6 +26,11 @@ jobs:
       - name: Install npm deps
         run: npm ci
 
+      - name: Patch AdMob ConsentExecutor (UMP 3.x fix)
+        run: |
+          cp patches/ConsentExecutor.swift \
+            node_modules/@capacitor-community/admob/ios/Sources/AdMobPlugin/Consent/ConsentExecutor.swift
+
       - name: Sync web → iOS
         run: |
           npm run sync:web
