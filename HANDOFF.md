@@ -1,5 +1,17 @@
 # HANDOFF — Mac Claude için tam brief
 
+## 2026-06-09 — iOS Submitted for Review ✅
+
+- Build 1.0 (3) → App Store Connect → **"Waiting for Review"**
+- AdMob iOS App ID: `ca-app-pub-4146784294472727~6475450605`
+- TARGETED_DEVICE_FAMILY = "1" (iPhone-only — iPad desteği v1.1'e bırakıldı)
+- 10 screenshot çekildi, App Store Connect'e yüklendi (1284×2778)
+- Yedekler: `~/Desktop/kelimoli-ios-backup/` → kullanıcı Google Drive/USB'ye taşıdı
+- **Bir sonraki iOS update Mac gerektirir** — Şimal'in Mac'i veya GitHub Actions macOS runner kurulabilir
+- Apple onayı ~10-12 Haziran bekleniyor, "Manually Release" seçili
+
+---
+
 > Bu doküman Windows'taki Claude sohbetinin sonunda hazırlandı. Şu an kullanıcı Mac'e geçti, **iOS App Store yayını için Xcode/TestFlight aşamasındayız**. Aşağıdaki bilgileri okuyup KALDIĞIMIZ YERDEN devam et.
 
 **Hazırlanma:** 8 Haziran 2026 Pazartesi, sabah
