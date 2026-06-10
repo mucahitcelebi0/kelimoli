@@ -3844,8 +3844,20 @@ const Ads = (() => {
     const P = plugin();
     if (!P) return false;
     try {
+      // iOS ATT — initialize flag'i Capacitor AdMob v6.2 + iOS 26.5'te
+      // popup'ı tetiklemiyor, manuel çağrı şart (Apple review reject 10 Haz 2026)
+      const platform = window.Capacitor?.getPlatform?.();
+      if (platform === 'ios') {
+        try {
+          const res = await P.trackingAuthorizationStatus();
+          if (res && res.status === 'notDetermined') {
+            await P.requestTrackingAuthorization();
+          }
+        } catch (attErr) {
+          console.warn('[Kelimoli] ATT request failed:', attErr);
+        }
+      }
       await P.initialize({
-        requestTrackingAuthorization: true,
         testingDevices: [],
         initializeForTesting: _useTestAds,
       });
@@ -4941,6 +4953,20 @@ window.addEventListener('pagehide', flushProgress);
 // Önce premium durumunu öğren (reklam kararından ÖNCE), sonra premium değilse
 // reklamları hazırla. Banner alt nav görünen ekranlarda gösterilir.
 (async () => {
+  // 0) iOS ATT — Premium/Ads kararından ÖNCE, app açılır açılmaz iste
+  // (Apple review 10 Haz 2026: popup görünmüyordu — manuel çağrı şart)
+  try {
+    if (window.Capacitor?.getPlatform?.() === 'ios') {
+      const AdMobPlugin = window.Capacitor?.Plugins?.AdMob;
+      if (AdMobPlugin) {
+        const res = await AdMobPlugin.trackingAuthorizationStatus();
+        if (res && res.status === 'notDetermined') {
+          await AdMobPlugin.requestTrackingAuthorization();
+        }
+      }
+    }
+  } catch (e) { console.warn('[Kelimoli] ATT preflight failed:', e); }
+
   // 1) RevenueCat'i yapılandır + mevcut entitlement durumunu çek
   try { await Premium.init(); } catch (e) {}
   try { refreshPremiumBanner(); } catch (e) {}
