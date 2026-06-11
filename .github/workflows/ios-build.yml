@@ -36,6 +36,11 @@ jobs:
           cp patches/ConsentExecutor.swift \
             node_modules/@capacitor-community/admob/ios/Sources/AdMobPlugin/Consent/ConsentExecutor.swift
 
+      - name: Patch AdMob requestTrackingAuthorization main-thread fix (Apple App Review)
+        run: |
+          cp patches/AdMobPlugin.swift \
+            node_modules/@capacitor-community/admob/ios/Sources/AdMobPlugin/AdMobPlugin.swift
+
       - name: Sync web → iOS
         run: |
           npm run sync:web
