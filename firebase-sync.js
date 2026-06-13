@@ -89,9 +89,17 @@ const Cloud = (() => {
       });
 
       // İlk açılışta anonim olarak giriş yap (kullanıcı zaten giriş yapmamışsa)
+      // KRİTİK: 5sn timeout — Apple Review reject 12 Haz 2026.
+      // iPadOS 26.5 + restricted network'te signInAnonymously hang olursa
+      // _ready=true ASLA çağrılmaz, login modal'ı "Bağlanılıyor..."'da takılı kalır.
+      // Timeout ile hata sessiz log, _ready=true devam → kullanıcı email/password ile
+      // denerse explicit network error mesajı görür.
       if (!_auth.currentUser) {
         try {
-          await authMod.signInAnonymously(_auth);
+          await Promise.race([
+            authMod.signInAnonymously(_auth),
+            new Promise((resolve) => setTimeout(() => resolve(null), 5000))
+          ]);
         } catch (e) {
           console.warn('[Kelimoli] Anonim giriş başarısız:', e.code || e.message);
         }
@@ -119,14 +127,24 @@ const Cloud = (() => {
   async function signUpWithEmail(email, password) {
     if (!_ready) throw new Error('Cloud hazır değil');
     const { EmailAuthProvider, linkWithCredential, createUserWithEmailAndPassword } = _fb.authMod;
+    // 20sn timeout — iPadOS 26.5 + Firebase Auth REST API hang koruması.
+    // Timeout durumunda kullanıcı 'İnternet bağlantısı yok.' hatası görür, infinite loading değil.
+    const withTimeout = (promise) => Promise.race([
+      promise,
+      new Promise((_, reject) => setTimeout(() => {
+        const err = new Error('Sign-up timeout');
+        err.code = 'auth/network-request-failed';
+        reject(err);
+      }, 20000))
+    ]);
     if (_user && _user.isAnonymous) {
       // Anonim hesabı email/password'a yükselt — XP, streak, vs. korunur
       const cred = EmailAuthProvider.credential(email, password);
-      const result = await linkWithCredential(_user, cred);
+      const result = await withTimeout(linkWithCredential(_user, cred));
       _user = result.user;
       return result.user;
     }
-    const result = await createUserWithEmailAndPassword(_auth, email, password);
+    const result = await withTimeout(createUserWithEmailAndPassword(_auth, email, password));
     _user = result.user;
     return result.user;
   }
@@ -145,7 +163,15 @@ const Cloud = (() => {
       ]);
     } catch (e) {}
     const { signInWithEmailAndPassword } = _fb.authMod;
-    const result = await signInWithEmailAndPassword(_auth, email, password);
+    // 20sn timeout — Firebase Auth REST API hang koruması (Apple Review reject 12 Haz).
+    const result = await Promise.race([
+      signInWithEmailAndPassword(_auth, email, password),
+      new Promise((_, reject) => setTimeout(() => {
+        const err = new Error('Sign-in timeout');
+        err.code = 'auth/network-request-failed';
+        reject(err);
+      }, 20000))
+    ]);
     _user = result.user;
     return result.user;
   }
