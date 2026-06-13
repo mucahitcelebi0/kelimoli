@@ -240,7 +240,11 @@ const Cloud = (() => {
       updatedAt: serverTimestamp(),
     };
     try {
-      await setDoc(ref, payload, { merge: true });
+      // 8sn timeout — Firestore write hang koruması (iPadOS 26.5 network).
+      await Promise.race([
+        setDoc(ref, payload, { merge: true }),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('syncNow timeout')), 8000))
+      ]);
       return true;
     } catch (e) {
       console.warn('[Kelimoli] Cloud sync hatası:', e.code || e.message);
@@ -333,7 +337,11 @@ const Cloud = (() => {
     }
 
     try {
-      const snap = await getDoc(ref);
+      // 8sn timeout — Firestore read hang koruması (iPadOS 26.5 network).
+      const snap = await Promise.race([
+        getDoc(ref),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('pullAndMerge timeout')), 8000))
+      ]);
       if (!snap.exists()) {
         // Cihaz yeni — local'i buluta yükle (kullanıcı değiştiyse de wipe sonrası boş yüklenir)
         store.ownerUid = currentUid;
@@ -470,7 +478,12 @@ const Cloud = (() => {
         orderBy('weeklyXp', 'desc'),
         limit(limitN)
       );
-      const snap = await getDocs(q);
+      // 10sn timeout — Firestore read hang koruması (Apple Review 12 Haz 2026
+      // bug pattern: iPadOS 26.5 network call sometimes hangs indefinitely).
+      const snap = await Promise.race([
+        getDocs(q),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Leaderboard fetch timeout')), 10000))
+      ]);
       const entries = [];
       snap.forEach(d => entries.push({ id: d.id, ...d.data() }));
       return entries;
