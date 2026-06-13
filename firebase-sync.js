@@ -135,7 +135,15 @@ const Cloud = (() => {
     if (!_ready) throw new Error('Cloud hazır değil');
     // Hesap değişiminden ÖNCE mevcut kullanıcının (misafir/anonim) verisini buluta yaz
     // ki senkronize olmamış son ilerleme (görevler dahil) kaybolmasın.
-    try { await flushSync(); } catch (e) {}
+    // KRİTİK: Apple Review reject 12 Haz 2026 — login indefinite loading sebebi
+    // flushSync iPad iOS 26.5'te bazen resolve etmiyor (network/Firestore hang).
+    // Promise.race ile 3sn timeout → sign-in akışı bloke edilmez.
+    try {
+      await Promise.race([
+        flushSync(),
+        new Promise((resolve) => setTimeout(resolve, 3000))
+      ]);
+    } catch (e) {}
     const { signInWithEmailAndPassword } = _fb.authMod;
     const result = await signInWithEmailAndPassword(_auth, email, password);
     _user = result.user;

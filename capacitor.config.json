@@ -6,7 +6,22 @@
     "allowMixedContent": false,
     "backgroundColor": "#F0EBDD"
   },
+  "ios": {
+    "limitsNavigationsToAppBoundDomains": false,
+    "contentInset": "always"
+  },
   "server": {
-    "androidScheme": "https"
+    "androidScheme": "https",
+    "iosScheme": "https",
+    "allowNavigation": [
+      "*.firebaseapp.com",
+      "*.firebaseio.com",
+      "*.googleapis.com",
+      "*.gstatic.com",
+      "*.google.com",
+      "*.cloudfunctions.net",
+      "kelimoli.firebaseapp.com",
+      "kelimoli.firebasestorage.app"
+    ]
   }
 }
