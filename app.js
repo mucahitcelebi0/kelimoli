@@ -1295,7 +1295,7 @@ function showScreen(name) {
 
   // Banner reklam — alt nav görünen ekranlarda göster, tam ekran oyunlarda gizle
   // (Premium kullanıcıda hiç gösterilmez — syncBanner içinde kontrol edilir)
-  try { if (typeof Ads !== 'undefined' && Ads.syncBanner) Ads.syncBanner(navVisible); } catch (e) {}
+  try { if (typeof Ads !== 'undefined' && Ads.syncBanner) Ads.syncBanner(name, navVisible); } catch (e) {}
 
   // Oyun başlıklarındaki kalp göstergelerini güncelle
   renderHearts();
@@ -3908,10 +3908,12 @@ const Ads = (() => {
     const P = plugin(); if (!P) return;
     try { await P.hideBanner(); _bannerVisible = false; } catch (e) { _bannerVisible = false; }
   }
-  // Ekran adına göre banner'ı göster/gizle — showScreen'den çağrılır.
-  // Tam ekran oyunlarda (bottomNav gizli) banner da gizlenir.
-  function syncBanner(navVisible) {
-    if (navVisible && !Premium.isPremium()) showBanner();
+  // Banner sadece quiz/sınav/oyun ekranlarında — ana sayfa, profil, kelime listesi
+  // gibi gezinme ekranlarında uygulama "premium" görünsün diye gizli.
+  const BANNER_SCREENS = new Set(['quiz', 'exam', 'verbs', 'order', 'match', 'mistakes']);
+  function syncBanner(screenName, navVisible) {
+    if (Premium.isPremium()) { hideBanner(); return; }
+    if (navVisible && BANNER_SCREENS.has(screenName)) showBanner();
     else hideBanner();
   }
 
@@ -4995,7 +4997,7 @@ window.addEventListener('pagehide', flushProgress);
   // Init geç tamamlandıysa: o an açık olan ekran için banner'ı tetikle
   const active = document.querySelector('.screen.active')?.dataset.screen;
   const hideNav = ['movie', 'onboarding', 'listen', 'false-friends', 'stories-menu', 'story', 'leaderboard', 'paywall'];
-  if (active && !hideNav.includes(active)) Ads.syncBanner(true);
+  if (active) Ads.syncBanner(active, !hideNav.includes(active));
 })();
 if (!store.onboarded) {
   setOnbStep(1);
