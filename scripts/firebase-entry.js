@@ -19,6 +19,9 @@ import {
 } from 'firebase/auth';
 import {
   getFirestore,
+  initializeFirestore,
+  persistentLocalCache,
+  persistentSingleTabManager,
   doc,
   getDoc,
   setDoc,
@@ -51,6 +54,9 @@ window.FirebaseBundle = {
   },
   firestoreMod: {
     getFirestore,
+    initializeFirestore,
+    persistentLocalCache,
+    persistentSingleTabManager,
     doc,
     getDoc,
     setDoc,

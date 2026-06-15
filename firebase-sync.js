@@ -63,7 +63,19 @@ const Cloud = (() => {
         }
       }
 
-      _db   = firestoreMod.getFirestore(_app);
+      // Offline persistence: kullanıcı internetsizken bile son state'i görür,
+      // bağlantı dönünce otomatik sync olur. initializeFirestore getFirestore'dan
+      // ÖNCE çağrılmalı. Capacitor tek WebView olduğundan SingleTabManager yeterli.
+      try {
+        _db = firestoreMod.initializeFirestore(_app, {
+          localCache: firestoreMod.persistentLocalCache({
+            tabManager: firestoreMod.persistentSingleTabManager(),
+          }),
+        });
+      } catch (e) {
+        // Bazı senaryolarda initializeFirestore tekrar çağrılırsa atar — fallback
+        _db = firestoreMod.getFirestore(_app);
+      }
       _fb   = { authMod, firestoreMod };
 
       if (analyticsMod && cfg.measurementId) {
