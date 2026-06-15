@@ -2622,12 +2622,17 @@ function renderFalseFriends() {
     { text: filler,         kind: 'wrong' },
   ]);
 
+  // Şıkta parantez içi ipucu gösterme — "üretkenlik (industrious)" gibi notlar
+  // hangi İngilizce kelimeye ait olduğunu ele verip cevabı sızdırıyor. Parantezsiz
+  // göster; tam metin (ipucuyla) cevaptan SONRA açıklama panelinde öğretilir.
+  const stripHint = (s) => String(s).replace(/\s*\([^)]*\)/g, '').replace(/\s+/g, ' ').trim();
+
   const wrap = $('#ffOptions');
   wrap.innerHTML = '';
   opts.forEach(o => {
     const b = document.createElement('button');
     b.className = 'ff-option';
-    b.textContent = o.text;
+    b.textContent = stripHint(o.text);
     b.dataset.kind = o.kind;
     b.addEventListener('click', () => onFFAnswer(b));
     wrap.appendChild(b);
