@@ -692,6 +692,8 @@ body {
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;   /* iOS momentum scroll */
+  overscroll-behavior-y: contain;      /* iOS bounce parent'a yayılmasın */
 }
 .screens::-webkit-scrollbar { display: none; }
 .screen {
@@ -1225,10 +1227,7 @@ html[data-theme="dark"] .ad-label-pill {
   border-radius: 14px;
   color: var(--muted);
   background: transparent;
-  transition:
-    background .28s ease,
-    color .2s ease,
-    transform .35s cubic-bezier(.34,1.56,.64,1);
+  transition: background .2s ease, color .2s ease;
 }
 .nav-btn .nav-icon .icon { width: 23px; height: 23px; transition: inherit; }
 .nav-btn .nav-label {
@@ -1237,7 +1236,7 @@ html[data-theme="dark"] .ad-label-pill {
   letter-spacing: .2px;
   transition: color .2s ease, font-weight .15s ease;
 }
-/* küçük üst gösterge çizgisi (sekme indikatörü) */
+/* küçük üst gösterge çizgisi (sekme indikatörü) — sadece görsel sinyal, buton hareket etmez */
 .nav-btn::before {
   content: '';
   position: absolute;
@@ -1249,22 +1248,17 @@ html[data-theme="dark"] .ad-label-pill {
   background: var(--gold);
   transform: translateX(-50%) scaleX(0);
   opacity: 0;
-  transition: transform .3s ease, opacity .3s ease;
+  transition: transform .25s ease, opacity .25s ease;
 }
 
-/* ---- AKTİF ---- */
+/* ---- AKTİF ---- buton yerinden çıkmaz, sadece renk değişir */
 .nav-btn.active { color: var(--ink); }
 .nav-btn.active .nav-icon {
   background: rgba(245, 158, 11, 0.14);
   color: var(--gold);
-  transform: translateY(-3px);
 }
 .nav-btn.active .nav-label { color: var(--ink); font-weight: 700; }
 .nav-btn.active::before { transform: translateX(-50%) scaleX(1); opacity: 1; }
-
-/* dokunma geri bildirimi */
-.nav-btn:active .nav-icon { transform: scale(.9); }
-.nav-btn.active:active .nav-icon { transform: translateY(-3px) scale(.92); }
 
 @media (prefers-reduced-motion: reduce) {
   .nav-btn .nav-icon, .nav-btn::before { transition: color .15s ease, background .15s ease; }
@@ -1323,7 +1317,14 @@ html[data-theme="dark"] .ad-label-pill {
 }
 .lesson-body { padding: 16px 20px 28px; }
 /* Sadece quiz/exam/verbs/order'da body kayan flex alanı olur (footer'la çakışmaz) */
-.screen-quiz .lesson-body { flex: 1; min-height: 0; overflow-y: auto; padding-bottom: 20px; }
+.screen-quiz .lesson-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-bottom: 20px;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
 .lesson-tag {
   display: inline-block;
   font-size: 10.5px;
