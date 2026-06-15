@@ -2383,6 +2383,9 @@ html[data-theme="dark"] .ad-label-pill {
   .device-screen { border-radius: 0; }
   body { padding: 0; }
   .hint-text { display: none; }
+  /* Fake status bar (9:41 / batarya) sadece masaüstü preview için — gerçek cihazda
+     iOS/Android'in kendi status bar'ı zaten üstte var, çift gözüküyor. Gizle. */
+  .status-bar { display: none; }
 }
 
 /* ========================= HATA DEFTERİ ========================= */
