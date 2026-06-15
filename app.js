@@ -1296,6 +1296,9 @@ function showScreen(name) {
   // Banner reklam — alt nav görünen ekranlarda göster, tam ekran oyunlarda gizle
   // (Premium kullanıcıda hiç gösterilmez — syncBanner içinde kontrol edilir)
   try { if (typeof Ads !== 'undefined' && Ads.syncBanner) Ads.syncBanner(name, navVisible); } catch (e) {}
+  // Firebase Analytics screen_view — retention/funnel için kritik. Firebase
+  // resmi event şeması: screen_name + screen_class.
+  try { if (window.Cloud && Cloud.logEvent) Cloud.logEvent('screen_view', { screen_name: name, screen_class: name }); } catch (e) {}
 
   // Oyun başlıklarındaki kalp göstergelerini güncelle
   renderHearts();
@@ -3698,6 +3701,8 @@ function commitOnboarding() {
 }
 function finishOnboarding() {
   commitOnboarding();
+  // Firebase resmi event'i tutorial_complete — yeni kullanıcı dönüşüm hunisi için kritik
+  try { if (window.Cloud && Cloud.logEvent) Cloud.logEvent('tutorial_complete'); } catch (e) {}
   showScreen('home');
 }
 
@@ -3906,6 +3911,7 @@ const Ads = (() => {
       });
       _bannerVisible = true;
       _toggleAdLabel(true);
+      try { if (window.Cloud && Cloud.logEvent) Cloud.logEvent('ad_impression', { ad_format: 'banner', ad_platform: 'admob' }); } catch (e) {}
     } catch (e) {}
   }
   async function hideBanner() {
@@ -3951,6 +3957,7 @@ const Ads = (() => {
     try {
       await P.showInterstitial();
       _interstitialReady = false;
+      try { if (window.Cloud && Cloud.logEvent) Cloud.logEvent('ad_impression', { ad_format: 'interstitial', ad_platform: 'admob' }); } catch (e) {}
       prepareInterstitial(); // sonraki için hazırla
       return true;
     } catch (e) { return false; }
@@ -3979,6 +3986,7 @@ const Ads = (() => {
     try {
       const result = await P.showRewardVideoAd();
       _rewardedReady = false;
+      try { if (window.Cloud && Cloud.logEvent) Cloud.logEvent('ad_impression', { ad_format: 'rewarded', ad_platform: 'admob' }); } catch (e) {}
       prepareRewarded();
       // result.type === 'reward' anlamına gelir; basit kabul edelim
       return { rewarded: true, amount: result?.amount || 1 };
@@ -4547,6 +4555,8 @@ async function onPaywallBuy() {
   btn.disabled = false;
   btn.textContent = 'Devam Et';
   if (result.ok) {
+    // Firebase resmi e-commerce event'i — conversion funnel için kritik
+    try { if (window.Cloud && Cloud.logEvent) Cloud.logEvent('purchase', { item_id: _selectedPlanId, currency: result.currency || 'TRY', value: result.price || 0 }); } catch (e) {}
     refreshPremiumBanner();
     try { Ads.hideBanner(); } catch (e) {}
     showAchievementPopup({ icon: '👑', name: 'Teşekkürler!', desc: 'Premium aktif — reklamsız + tüm özellikler' });
