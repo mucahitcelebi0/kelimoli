@@ -7,6 +7,7 @@
 
 const Cloud = (() => {
   let _ready = false;
+  let _initPromise = null;
   let _app = null;
   let _auth = null;
   let _db = null;
@@ -25,6 +26,10 @@ const Cloud = (() => {
 
   async function init() {
     if (_ready) return true;
+    // Eşzamanlı init çağrılarını tek promise altında topla — birden çok yer
+    // (app boot + auth modal click) aynı anda tetiklerse double initializeApp olmaz.
+    if (_initPromise) return _initPromise;
+    _initPromise = (async () => {
     const cfg = window.FIREBASE_CONFIG;
     if (!cfg || !cfg.apiKey || cfg.apiKey.startsWith('AIzaXXX')) {
       console.info('[Kelimoli] Firebase config eklenmemiş — local-only modda.');
@@ -111,6 +116,10 @@ const Cloud = (() => {
       console.error('[Kelimoli] Firebase init başarısız:', e);
       return false;
     }
+    })();
+    const result = await _initPromise;
+    if (!result) _initPromise = null;   // başarısızsa retry yapılabilsin
+    return result;
   }
 
   function onAuthStateChange(fn) {

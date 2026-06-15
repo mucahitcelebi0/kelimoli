@@ -4701,16 +4701,26 @@ function refreshLeaderboardBanner() {
 function refreshAccountUI() {
   const sec = $('#accountSection');
   if (!sec) return;
-  if (!window.Cloud || !Cloud.isReady()) {
-    sec.style.display = 'none';
-    return;
-  }
   sec.style.display = 'block';
-  const user = Cloud.currentUser();
   const status = $('#accountStatus');
   const sub = $('#accountSub');
   const actions = $('#accountActions');
   const icon = $('#accountIcon');
+  // Cloud henüz hazır değilse misafir görünümünü göster — kullanıcı yine de Hesap
+  // Oluştur/Giriş Yap'a tıklayabilsin. Modal kendisi Cloud.init retry yapacak.
+  if (!window.Cloud || !Cloud.isReady()) {
+    icon.innerHTML = iconSvg('cloud');
+    status.textContent = 'Misafir';
+    sub.textContent = 'İlerlemen bu cihazda tutuluyor. Hesap aç, hiç kaybetme.';
+    actions.innerHTML = `
+      <button class="btn btn-gold" id="acctUpgrade">Hesap Oluştur</button>
+      <button class="btn btn-ghost" id="acctSignIn">Giriş Yap</button>
+    `;
+    $('#acctUpgrade').addEventListener('click', () => openAuthModal('signup'));
+    $('#acctSignIn').addEventListener('click', () => openAuthModal('signin'));
+    return;
+  }
+  const user = Cloud.currentUser();
   if (!user) {
     status.textContent = 'Bağlanıyor…';
     sub.textContent = 'Lütfen bekle';
@@ -4815,10 +4825,13 @@ function bindAuthHandlers() {
     if (pw.length < 6) { err.textContent = 'Şifre en az 6 karakter olmalı.'; return; }
     const mode = $('#authModal').dataset.mode || 'signup';
     $('#authSubmit').disabled = true;
-    // Firebase CDN'den geç yüklenmiş olabilir — hazır olmasını kısa süre bekle
+    // Firebase CDN'den geç yüklenmiş olabilir — hazır olmasını kısa süre bekle.
+    // İlk init başarısız olduysa burada tekrar tetikle (kullanıcı tekrar denediğinde
+    // ağ artık varsa init succeed eder). Cloud.init idempotent: _ready true ise no-op.
     if (!(window.Cloud && Cloud.isReady && Cloud.isReady())) {
       $('#authSubmit').textContent = 'Bağlanılıyor…';
-      const ready = await waitForCloudReady(8000);
+      try { if (window.Cloud && Cloud.init) Cloud.init(); } catch (e) {}
+      const ready = await waitForCloudReady(15000);
       if (!ready) {
         err.textContent = 'Sunucuya bağlanılamadı. İnternetini kontrol edip tekrar dene.';
         $('#authSubmit').disabled = false;
