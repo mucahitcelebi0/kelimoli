@@ -4,6 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
   <title>Kelimoli — İngilizce Kelime Akademisi</title>
+  <script>
+    // Capacitor native uygulamada sahte status bar'ı (telefon mockup dekoru) baştan
+    // gizle — gerçek OS status bar zaten üstte. Viewport genişliğinden bağımsız kesin
+    // çözüm; bridge window.Capacitor'ı script çalışmadan önce enjekte eder.
+    if (window.Capacitor) document.documentElement.classList.add('cap-native');
+  </script>
 
   <!-- ============== PWA ============== -->
   <link rel="manifest" href="manifest.json" />

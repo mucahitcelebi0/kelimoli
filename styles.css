@@ -2387,6 +2387,8 @@ html[data-theme="dark"] .ad-label-pill {
      iOS/Android'in kendi status bar'ı zaten üstte var, çift gözüküyor. Gizle. */
   .status-bar { display: none; }
 }
+/* Capacitor native uygulamada — viewport genişliğinden bağımsız — her zaman gizle. */
+html.cap-native .status-bar { display: none; }
 
 /* ========================= HATA DEFTERİ ========================= */
 .screen-mistakes { padding: 0; }
