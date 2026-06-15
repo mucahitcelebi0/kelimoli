@@ -4867,6 +4867,28 @@ function bindAuthHandlers() {
     if (!email || !pw) { err.textContent = 'E-posta ve şifre gerekli.'; return; }
     if (pw.length < 6) { err.textContent = 'Şifre en az 6 karakter olmalı.'; return; }
     const mode = $('#authModal').dataset.mode || 'signup';
+    // GİRİŞ YAP, mevcut hesabın bulut verisini yükler ve bu cihazdaki misafir
+    // ilerlemesini onunla DEĞİŞTİRİR (uid değişimi → local sıfırlanır). Hesap Oluştur
+    // (link) ilerlemeyi korur; Giriş Yap korumaz. Misafirin kaydedilmemiş XP'si varsa
+    // sessizce silmek yerine önce onay al — kötü sürpriz + 1 yıldız yorum önlenir.
+    const guestProgress = (store.xp || 0) > 0 || (store.totalAnswered || 0) > 0;
+    const isGuest = !(window.Cloud && Cloud.isReady && Cloud.isReady() && Cloud.currentUser && Cloud.currentUser() && !Cloud.currentUser().isAnonymous);
+    if (mode === 'signin' && isGuest && guestProgress) {
+      showConfirm({
+        title: 'Misafir ilerlemen değişecek',
+        message: `Bu cihazda ${store.xp || 0} XP'lik misafir ilerlemen var. Giriş yapınca bu cihazdaki ilerleme, hesabındaki kayıtla değişir. Mevcut ilerlemeni korumak istersen "Hesap Oluştur"u kullan.`,
+        confirmText: 'Yine de giriş yap',
+        cancelText: 'Vazgeç',
+        danger: true,
+        onConfirm: () => doAuthSubmit(mode, email, pw, err),
+      });
+      return;
+    }
+    doAuthSubmit(mode, email, pw, err);
+  });
+}
+
+async function doAuthSubmit(mode, email, pw, err) {
     $('#authSubmit').disabled = true;
     // Firebase CDN'den geç yüklenmiş olabilir — hazır olmasını kısa süre bekle.
     // İlk init başarısız olduysa burada tekrar tetikle (kullanıcı tekrar denediğinde
@@ -4904,7 +4926,6 @@ function bindAuthHandlers() {
       $('#authSubmit').disabled = false;
       $('#authSubmit').textContent = mode === 'signup' ? 'Hesap Oluştur' : 'Giriş Yap';
     }
-  });
 }
 
 // ---------- BULUT (Firebase) ----------
