@@ -4797,12 +4797,9 @@ function openAuthModal(mode = 'signup', fromOnboarding = false) {
 }
 function closeAuthModal() {
   $('#authModal').style.display = 'none';
-  // Onboarding'den açıldıysa kapanınca ana sayfaya geç (kullanıcı X'e bassa bile misafir olarak girer)
-  if (_authFromOnboarding) {
-    _authFromOnboarding = false;
-    const active = document.querySelector('.screen.active')?.dataset.screen;
-    if (active === 'onboarding') showScreen('home');
-  }
+  // X yalnızca modal'ı kapatır. Onboarding ekranındaysa kullanıcı orada kalır ve
+  // "Misafir devam et"i açıkça seçmeli. Auth iptali = misafir kabulü değil.
+  _authFromOnboarding = false;
 }
 function setAuthMode(mode) {
   const forgot = $('#authForgot');
