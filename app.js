@@ -3817,16 +3817,24 @@ function initOnboarding() {
 // AdMob Console'da gerçek unit ID'lerini al ve aşağıya yaz.
 // Premium kullanıcılarda hiçbir reklam gösterilmez.
 // =====================================================================
+// AdMob unit ID'leri platform-bazlı. iOS ve Android ayrı AdMob app'lerine ait —
+// AdMob policy gereği cross-platform unit kullanımı reddedilir.
 const ADMOB_IDS = {
-  // Google'ın resmi test ID'leri — bunlarla geliştirme yapabilirsin
-  testBanner:       'ca-app-pub-3940256099942544/6300978111',
-  testInterstitial: 'ca-app-pub-3940256099942544/1033173712',
-  testRewarded:     'ca-app-pub-3940256099942544/5224354917',
-
-  // YAYIN ID'leri — Kelimoli'nin gerçek AdMob unit ID'leri
-  banner:       'ca-app-pub-4146784294472727/7969688612',
-  interstitial: 'ca-app-pub-4146784294472727/1428330994',
-  rewarded:     'ca-app-pub-4146784294472727/9352191112',
+  test: {
+    banner:       'ca-app-pub-3940256099942544/6300978111',
+    interstitial: 'ca-app-pub-3940256099942544/1033173712',
+    rewarded:     'ca-app-pub-3940256099942544/5224354917',
+  },
+  android: {
+    banner:       'ca-app-pub-4146784294472727/7969688612',
+    interstitial: 'ca-app-pub-4146784294472727/1428330994',
+    rewarded:     'ca-app-pub-4146784294472727/9352191112',
+  },
+  ios: {
+    banner:       'ca-app-pub-4146784294472727/2340628429',
+    interstitial: 'ca-app-pub-4146784294472727/1315616516',
+    rewarded:     'ca-app-pub-4146784294472727/5550374990',
+  },
 };
 
 const Ads = (() => {
@@ -3869,8 +3877,9 @@ const Ads = (() => {
     }
   }
   function adUnit(type) {
-    if (_useTestAds) return ADMOB_IDS[`test${type[0].toUpperCase()}${type.slice(1)}`];
-    return ADMOB_IDS[type];
+    if (_useTestAds) return ADMOB_IDS.test[type];
+    const platform = window.Capacitor?.getPlatform?.() === 'ios' ? 'ios' : 'android';
+    return ADMOB_IDS[platform][type];
   }
   // Reklam gösterilsin mi? Test modunda kapalı; premium kullanıcıda hiç gösterilmez.
   function shouldShow() {
