@@ -3438,6 +3438,7 @@ const ONB_TOTAL_STEPS = 6;
 const onbState = {
   step: 1,
   reason: '',
+  reasons: [],        // çoklu seçim — neden İngilizce öğreniyorsun
   goal: 10,
   level: null,        // kullanıcının seçtiği ya da testle bulunan seviye
   lvlIdx: 0,
@@ -3598,18 +3599,20 @@ function bindOnbName() {
   });
 }
 
-// Step 3 — Sebep seçimi
+// Step 3 — Sebep seçimi (çoklu seçim — kullanıcı birden fazla neden seçebilir)
 function bindOnbReason() {
   const list = $('#onbReasonList');
   const next = $('#onbReasonNext');
   if (!list || !next) return;
+  if (!Array.isArray(onbState.reasons)) onbState.reasons = [];
   list.addEventListener('click', (e) => {
     const btn = e.target.closest('.onb-opt');
     if (!btn) return;
-    list.querySelectorAll('.onb-opt').forEach(b => b.classList.remove('selected'));
-    btn.classList.add('selected');
-    onbState.reason = btn.dataset.reason;
-    next.disabled = false;
+    const reason = btn.dataset.reason;
+    const i = onbState.reasons.indexOf(reason);
+    if (i >= 0) { onbState.reasons.splice(i, 1); btn.classList.remove('selected'); }
+    else        { onbState.reasons.push(reason);  btn.classList.add('selected'); }
+    next.disabled = onbState.reasons.length === 0;
   });
 }
 
@@ -3703,7 +3706,10 @@ function renderOnbSummary() {
   $('#onbSumName').textContent = name;
   $('#onbSumLevel').textContent = level;
   $('#onbSumGoal').textContent = `${onbState.goal} soru`;
-  $('#onbSumReason').textContent = reasonLabels[onbState.reason] || 'Genel';
+  const reasons = Array.isArray(onbState.reasons) ? onbState.reasons : [];
+  $('#onbSumReason').textContent = reasons.length
+    ? reasons.map(r => reasonLabels[r] || r).join(', ')
+    : 'Genel';
 }
 
 // Onboarding verilerini kaydet (isim/seviye/hedef) — ekran DEĞİŞTİRMEZ.
@@ -3712,7 +3718,9 @@ function renderOnbSummary() {
 function commitOnboarding() {
   const name = ($('#onbName').value || '').trim() || 'Dostum';
   store.user.name = name;
-  store.user.reason = onbState.reason || 'hobby';
+  const reasons = Array.isArray(onbState.reasons) ? onbState.reasons : [];
+  store.user.reasons = reasons;                      // çoklu seçim
+  store.user.reason = reasons[0] || 'hobby';         // geriye dönük uyumluluk (tek alan)
   store.user.level = onbState.level || 'A1';
   store.dailyGoal = onbState.goal;
   store.onboarded = true;
