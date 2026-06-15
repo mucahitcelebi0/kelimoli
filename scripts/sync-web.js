@@ -23,6 +23,7 @@ const FILES = [
   'icon.svg',
   'icon-maskable.svg',
   'firebase-config.js',
+  'firebase-bundle.js',
   'firebase-sync.js',
   'revenuecat-config.js',
 ];

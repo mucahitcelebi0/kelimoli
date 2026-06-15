@@ -4,7 +4,8 @@
   "private": true,
   "description": "Kelimoli — İngilizce Kelime Akademisi (Türkçe→İngilizce öğrenme uygulaması)",
   "scripts": {
-    "sync:web": "node scripts/sync-web.js",
+    "build:firebase": "node scripts/build-firebase.js",
+    "sync:web": "npm run build:firebase && node scripts/sync-web.js",
     "cap:copy": "npm run sync:web && cap copy android",
     "cap:open": "cap open android",
     "android": "npm run cap:copy && npm run cap:open"
@@ -18,10 +19,12 @@
     "@capacitor/haptics": "^6.0.3",
     "@capacitor/ios": "^6.2.1",
     "@capacitor/local-notifications": "^6.1.3",
-    "@revenuecat/purchases-capacitor": "^9.2.2"
+    "@revenuecat/purchases-capacitor": "^9.2.2",
+    "firebase": "^12.14.0"
   },
   "devDependencies": {
     "@capacitor/assets": "^3.0.5",
-    "@capacitor/cli": "^6.1.2"
+    "@capacitor/cli": "^6.1.2",
+    "esbuild": "^0.28.1"
   }
 }

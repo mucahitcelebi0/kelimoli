@@ -36,13 +36,14 @@ const Cloud = (() => {
       return false;
     }
     try {
-      // Modüler SDK'yı CDN'den ES module olarak yükle
-      const [{ initializeApp }, authMod, firestoreMod, analyticsMod] = await Promise.all([
-        import('https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js'),
-        import('https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js'),
-        import('https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js'),
-        import('https://www.gstatic.com/firebasejs/10.13.0/firebase-analytics.js').catch(() => null),
-      ]);
+      // Firebase SDK'sı uygulamayla bundle'lanmış (firebase-bundle.js). CDN bağımlılığı yok —
+      // iOS'ta gstatic.com'a istek atmadan offline da init olur. Bundle yüklenmediyse
+      // graceful fallback: local-only mode.
+      if (!window.FirebaseBundle) {
+        console.warn('[Kelimoli] FirebaseBundle yüklenmemiş — local-only modda.');
+        return false;
+      }
+      const { initializeApp, authMod, firestoreMod, analyticsMod } = window.FirebaseBundle;
 
       _app = initializeApp(cfg);
       _auth = authMod.getAuth(_app);
@@ -503,19 +504,12 @@ const Cloud = (() => {
   }
 
   // ----- Analytics -----
-  let _analyticsMod = null;
   function logEvent(name, params) {
     if (!_analytics) return;
-    if (_analyticsMod && _analyticsMod.logEvent) {
-      try { _analyticsMod.logEvent(_analytics, name, params || {}); } catch (e) {}
-      return;
+    const analyticsMod = window.FirebaseBundle && window.FirebaseBundle.analyticsMod;
+    if (analyticsMod && analyticsMod.logEvent) {
+      try { analyticsMod.logEvent(_analytics, name, params || {}); } catch (e) {}
     }
-    import('https://www.gstatic.com/firebasejs/10.13.0/firebase-analytics.js')
-      .then(m => {
-        _analyticsMod = m;
-        if (m.logEvent && _analytics) m.logEvent(_analytics, name, params || {});
-      })
-      .catch(() => {});
   }
 
   return {
