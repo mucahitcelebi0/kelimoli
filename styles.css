@@ -1156,6 +1156,37 @@ body {
   font-weight: 300;
 }
 
+/* ============== AD LABEL ============== */
+/* Native AdMob banner'ın üstünde duran "REKLAM" çipi. Banner margin: 56
+   (ekran altından) + ~55px banner yüksekliği üstüne tam oturur. */
+.ad-label {
+  position: absolute;
+  bottom: 115px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  z-index: 90;
+  pointer-events: none;
+  user-select: none;
+}
+.ad-label[hidden] { display: none; }
+.ad-label-pill {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: rgba(0,0,0,0.45);
+  background: rgba(0,0,0,0.06);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+html[data-theme="dark"] .ad-label-pill {
+  color: rgba(255,255,255,0.55);
+  background: rgba(255,255,255,0.08);
+}
+
 /* ============== BOTTOM NAV ============== */
 .bottom-nav {
   position: absolute;

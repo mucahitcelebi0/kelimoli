@@ -3888,6 +3888,10 @@ const Ads = (() => {
 
   // Banner — alt navigasyonun üstünde küçük banner
   let _bannerVisible = false;
+  function _toggleAdLabel(visible) {
+    const el = document.getElementById('adLabel');
+    if (el) el.hidden = !visible;
+  }
   async function showBanner() {
     if (!shouldShow()) return;
     if (_bannerVisible) return;       // zaten görünüyor — tekrar çağırma (titreme önlenir)
@@ -3901,9 +3905,11 @@ const Ads = (() => {
         isTesting: _useTestAds,
       });
       _bannerVisible = true;
+      _toggleAdLabel(true);
     } catch (e) {}
   }
   async function hideBanner() {
+    _toggleAdLabel(false);
     if (!_bannerVisible) return;
     const P = plugin(); if (!P) return;
     try { await P.hideBanner(); _bannerVisible = false; } catch (e) { _bannerVisible = false; }
