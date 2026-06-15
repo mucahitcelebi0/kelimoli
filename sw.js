@@ -7,7 +7,7 @@
 //   - YouTube iframe API: passthrough (cache'lemiyoruz)
 // =====================================================================
 
-const VERSION = 'kelimoli-v75';
+const VERSION = 'kelimoli-v76';
 const STATIC_CACHE = `${VERSION}-static`;
 const RUNTIME_CACHE = `${VERSION}-runtime`;
 
@@ -22,6 +22,7 @@ const PRECACHE_URLS = [
   './icon.svg',
   './icon-maskable.svg',
   './firebase-config.js',
+  './firebase-bundle.js',
   './firebase-sync.js',
   './revenuecat-config.js',
 ];
