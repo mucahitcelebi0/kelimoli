@@ -4795,6 +4795,7 @@ function closeAuthModal() {
   }
 }
 function setAuthMode(mode) {
+  const forgot = $('#authForgot');
   if (mode === 'signup') {
     $('#authTitle').textContent = 'Hesap Oluştur';
     $('#authSub').textContent = 'İlerlemeni kaybetme; tüm cihazlardan eriş.';
@@ -4802,6 +4803,7 @@ function setAuthMode(mode) {
     $('#authToggle').textContent = 'Zaten hesabın var mı? Giriş yap';
     $('#authPassword').setAttribute('autocomplete', 'new-password');
     $('#authModal').dataset.mode = 'signup';
+    if (forgot) forgot.hidden = true;
   } else {
     $('#authTitle').textContent = 'Giriş Yap';
     $('#authSub').textContent = 'Mevcut hesabınla devam et.';
@@ -4809,12 +4811,46 @@ function setAuthMode(mode) {
     $('#authToggle').textContent = 'Yeni misin? Hesap oluştur';
     $('#authPassword').setAttribute('autocomplete', 'current-password');
     $('#authModal').dataset.mode = 'signin';
+    if (forgot) forgot.hidden = false;
   }
 }
 function bindAuthHandlers() {
   $('#authClose')?.addEventListener('click', closeAuthModal);
   $('#authToggle')?.addEventListener('click', () => {
     setAuthMode($('#authModal').dataset.mode === 'signup' ? 'signin' : 'signup');
+  });
+  $('#authForgot')?.addEventListener('click', async () => {
+    const email = $('#authEmail').value.trim();
+    const err = $('#authError');
+    err.textContent = '';
+    if (!email) { err.textContent = 'Önce e-postanı yaz, sonra Şifremi Unuttum\'a bas.'; return; }
+    const btn = $('#authForgot');
+    btn.disabled = true;
+    const originalText = btn.textContent;
+    btn.textContent = 'Gönderiliyor…';
+    try {
+      if (!(window.Cloud && Cloud.isReady && Cloud.isReady())) {
+        try { if (window.Cloud && Cloud.init) Cloud.init(); } catch (e) {}
+        const ready = await waitForCloudReady(15000);
+        if (!ready) {
+          err.textContent = 'Sunucuya bağlanılamadı. İnternetini kontrol edip tekrar dene.';
+          return;
+        }
+      }
+      await Cloud.sendPasswordReset(email);
+      err.style.color = 'var(--success, #10B981)';
+      err.textContent = 'Sıfırlama bağlantısı gönderildi. Posta kutunu kontrol et.';
+      setTimeout(() => { err.style.color = ''; }, 6000);
+    } catch (e) {
+      const code = e.code || '';
+      err.textContent = code === 'auth/invalid-email' ? 'Geçersiz e-posta.'
+        : code === 'auth/user-not-found' ? 'Bu e-postayla kayıtlı kullanıcı yok.'
+        : code === 'auth/network-request-failed' ? 'İnternet bağlantısı yok.'
+        : (e.message || 'Bilinmeyen hata.');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = originalText;
+    }
   });
   $('#authSubmit')?.addEventListener('click', async () => {
     const email = $('#authEmail').value.trim();

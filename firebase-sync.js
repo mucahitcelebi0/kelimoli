@@ -186,6 +186,20 @@ const Cloud = (() => {
     return result.user;
   }
 
+  // Şifre sıfırlama e-postası gönder. 20sn timeout — hang olmasın.
+  async function sendPasswordReset(email) {
+    if (!_ready) throw new Error('Cloud hazır değil');
+    const { sendPasswordResetEmail } = _fb.authMod;
+    return Promise.race([
+      sendPasswordResetEmail(_auth, email),
+      new Promise((_, reject) => setTimeout(() => {
+        const err = new Error('Password reset timeout');
+        err.code = 'auth/network-request-failed';
+        reject(err);
+      }, 20000))
+    ]);
+  }
+
   async function signOut() {
     if (!_ready) return;
     // Çıkıştan ÖNCE mevcut hesabın verisini buluta yaz (kayıp olmasın)
@@ -520,6 +534,7 @@ const Cloud = (() => {
     onAuthStateChange,
     signUpWithEmail,
     signInWithEmail,
+    sendPasswordReset,
     signOut,
     scheduleSync,
     syncNow,

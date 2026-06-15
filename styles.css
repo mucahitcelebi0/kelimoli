@@ -4204,6 +4204,21 @@ html[data-theme="dark"] .ach-more-btn { color: var(--primary); }
   margin: 4px 2px 12px;
   font-weight: 500;
 }
+.auth-forgot {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  background: none;
+  border: none;
+  font-size: 13px;
+  color: var(--muted);
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 6px;
+  font-family: inherit;
+}
+.auth-forgot[hidden] { display: none; }
+.auth-forgot:hover { color: var(--ink); }
 
 /* =====================================================================
    LEADERBOARD — Haftalık lig ekranı + profilde banner
