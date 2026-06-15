@@ -277,23 +277,38 @@ function questProgressValue(q) {
   return (store.quests?.progress?.[q.metric]) || 0;
 }
 
+// Hedefine ulaşmış görevleri ödüllendirir. Bonus XP, başka bir 'xpEarned'
+// görevini de tetikleyebileceğinden sınırlı bir döngüyle tekrar tarar — eski
+// addXP ↔ bumpQuestMetric özyinelemesinin yerine düz ve sınırı belli bir geçiş.
+// claimed bayrağı çift ödülü, guard sayacı sonsuz döngüyü engeller.
+function awardCompletedQuests() {
+  if (!store.quests || !Array.isArray(store.quests.list)) return;
+  rollWeeklyCounter();
+  let changed = true, guard = 0;
+  while (changed && guard++ < 10) {
+    changed = false;
+    for (const item of store.quests.list) {
+      if (item.claimed) continue;
+      const def = getQuestDef(item.id);
+      if (!def) continue;
+      if (questProgressValue(def) >= def.target) {
+        item.claimed = true;
+        store.xp += def.xp;
+        store.weeklyXp = (store.weeklyXp || 0) + def.xp;
+        // Bonus XP de 'xpEarned' görevine sayılsın
+        store.quests.progress.xpEarned = (store.quests.progress.xpEarned || 0) + def.xp;
+        Feedback.levelUp();
+        showAchievementPopup({ icon: def.icon, name: 'Görev tamamlandı!', desc: `${def.name} · +${def.xp} XP` });
+        changed = true;
+      }
+    }
+  }
+}
+
 function bumpQuestMetric(metric, by = 1) {
   rollDailyQuests();
   store.quests.progress[metric] = (store.quests.progress[metric] || 0) + by;
-  saveStore();
-  // Tamamlanan görevleri otomatik ödüllendir
-  store.quests.list.forEach(item => {
-    if (item.claimed) return;
-    const def = getQuestDef(item.id);
-    if (!def) return;
-    if (questProgressValue(def) >= def.target) {
-      item.claimed = true;
-      addXP(def.xp); // bonus XP — checkAchievements de tetikler
-      Feedback.levelUp();
-      // Toast: rozet popup'ı yeniden kullan
-      showAchievementPopup({ icon: def.icon, name: 'Görev tamamlandı!', desc: `${def.name} · +${def.xp} XP` });
-    }
-  });
+  awardCompletedQuests();
   saveStore();
   renderQuests();
 }
@@ -676,8 +691,14 @@ function addXP(amount) {
   // Haftalık leaderboard sayacı (her pazartesi sıfırlanır)
   rollWeeklyCounter();
   store.weeklyXp = (store.weeklyXp || 0) + amount;
-  if (store.quests) bumpQuestMetric('xpEarned', amount);
-  else { saveStore(); }
+  // XP kazanımı 'xpEarned' görevine sayılır; tamamlanan görevlerin bonusu da
+  // awardCompletedQuests içinde verilir (özyineleme yok). Quest yoksa atla.
+  if (store.quests) {
+    store.quests.progress.xpEarned = (store.quests.progress.xpEarned || 0) + amount;
+    awardCompletedQuests();
+    renderQuests();
+  }
+  saveStore();
   refreshStats();
   checkAchievements();
   if (window.Cloud && Cloud.isReady()) Cloud.scheduleLeaderboardUpdate();
