@@ -1467,6 +1467,48 @@ html[data-theme="dark"] .ad-label-pill {
   border-top: 1px solid var(--line);
   z-index: 5;
 }
+
+/* ============== AYNI DESEN — diğer tam ekran akışlar ============== */
+/* false-friends, listen, story, paywall, leaderboard, stories-menu: alt nav VE üst
+   bar gizli (fullscreenGames), bu yüzden height:100% yeterli (.screens zaten o alanı
+   tam kaplıyor). mistakes: alt nav görünür, screen-quiz'deki gibi 72px boşluk bırak. */
+.screen-ff, .screen-listen, .screen-story, .screen-paywall,
+.screen-leaderboard, .screen-stories-menu {
+  display: none;
+  flex-direction: column;
+  height: 100%;
+  padding: 0;
+}
+.screen-ff.active, .screen-listen.active, .screen-story.active,
+.screen-paywall.active, .screen-leaderboard.active, .screen-stories-menu.active {
+  display: flex;
+}
+.screen-mistakes {
+  display: none;
+  flex-direction: column;
+  height: calc(100% - 72px);
+  padding: 0;
+}
+.screen-mistakes.active { display: flex; }
+
+/* Kayan içerik alanları — header/footer'ın arasında, tek başına scroll olur */
+.ff-body, .listen-body, .story-body, .paywall-body, .lb-body,
+.stories-menu-body, .mistakes-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
+
+/* Sabit footer'lar — lesson-footer ile aynı görünüm */
+.ff-footer, .listen-footer, .story-footer, .paywall-footer {
+  flex-shrink: 0;
+  padding: 12px 20px 14px;
+  background: var(--bg);
+  border-top: 1px solid var(--line);
+  z-index: 5;
+}
 .btn {
   border: none;
   font-family: var(--font-body);
@@ -4530,7 +4572,6 @@ html[data-theme="dark"] .premium-banner.active {
 .paywall-body {
   padding: 12px 20px 28px;
   background: linear-gradient(180deg, var(--bg) 0%, var(--bg-soft) 100%);
-  min-height: calc(100% - 56px);
 }
 .paywall-hero {
   text-align: center;
