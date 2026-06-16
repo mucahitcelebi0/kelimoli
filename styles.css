@@ -2798,6 +2798,20 @@ html.cap-native, html.cap-native body { position: fixed; overflow: hidden; width
   line-height: 1.15;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* Odak kartı: çoklu seçimde uzun metin olabilir ("Seyahat, Film & dizi, Sınav").
+   Tek satıra sığdırıp taşırmak yerine küçük punto + satır kaydırma ile göster,
+   kart grid sınırının dışına asla çıkmasın. */
+#onbSumReason {
+  white-space: normal;
+  word-break: break-word;
+  font-size: 15px;
+  line-height: 1.25;
+  text-overflow: clip;
+  overflow: visible;
 }
 .onb-fineprint {
   font-size: 12px;
