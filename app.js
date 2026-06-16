@@ -4954,8 +4954,17 @@ async function doAuthSubmit(mode, email, pw, err) {
       else                   await Cloud.signInWithEmail(email, pw);
       Cloud.logEvent(mode === 'signup' ? 'sign_up' : 'login', { method: 'email' });
       Feedback.levelUp();
+      // Onboarding'den gelmişse modal kapanınca özet ekranında değil, ana sayfada
+      // bırak. closeAuthModal flag'i sıfırlıyor → ÖNCE oku, sonra kapat, sonra
+      // navigation. (X butonu için aynı yönlendirme yok — bu sadece başarılı
+      // submit yolu için geçerli; misafir kabulü değil, "hesabım var, devam et".)
+      const cameFromOnboarding = _authFromOnboarding;
       closeAuthModal();
       refreshAccountUI();
+      if (cameFromOnboarding) {
+        const active = document.querySelector('.screen.active')?.dataset.screen;
+        if (active === 'onboarding') showScreen('home');
+      }
     } catch (e) {
       const code = e.code || '';
       const msg = code === 'auth/email-already-in-use' ? 'Bu e-posta zaten kayıtlı.'
