@@ -2386,9 +2386,15 @@ html[data-theme="dark"] .ad-label-pill {
   /* Fake status bar (9:41 / batarya) sadece masaüstü preview için — gerçek cihazda
      iOS/Android'in kendi status bar'ı zaten üstte var, çift gözüküyor. Gizle. */
   .status-bar { display: none; }
+  /* iOS WKWebView rubber-band fix: html/body'i tamamen kilitle ki sayfa scroll
+     sınırına gelince (üst/alt) parmak çekmeye devam edilince TÜM kabuk (üst bar,
+     alt nav) görünür alanda sıçramasın. Tek kayan alan .screens/.onb-body/
+     .lesson-body — onlarda zaten overflow-y:auto + overscroll-behavior var. */
+  html, body { position: fixed; overflow: hidden; width: 100%; height: 100%; }
 }
-/* Capacitor native uygulamada — viewport genişliğinden bağımsız — her zaman gizle. */
+/* Capacitor native uygulamada — viewport genişliğinden bağımsız — her zaman gizle/kilitle. */
 html.cap-native .status-bar { display: none; }
+html.cap-native, html.cap-native body { position: fixed; overflow: hidden; width: 100%; height: 100%; }
 
 /* ========================= HATA DEFTERİ ========================= */
 .screen-mistakes { padding: 0; }
