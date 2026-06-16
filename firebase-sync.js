@@ -29,7 +29,13 @@ const Cloud = (() => {
     // Eşzamanlı init çağrılarını tek promise altında topla — birden çok yer
     // (app boot + auth modal click) aynı anda tetiklerse double initializeApp olmaz.
     if (_initPromise) return _initPromise;
-    _initPromise = (async () => {
+    // Savunma katmanı: init() içindeki adımlardan biri (bilinmeyen bir SDK çağrısı,
+    // gelecekte eklenecek bir adım) timeout'suz asılı kalırsa init() artık SONSUZA
+    // DEK beklemiyor — 12sn'de false döner, _initPromise sıfırlanır, kullanıcı
+    // tekrar denediğinde yeni bir deneme şansı olur. Asıl iş hâlâ arka planda
+    // sürer ama UI onu beklemekten vazgeçer (diğer Promise.race'lerle aynı desen).
+    _initPromise = Promise.race([
+      (async () => {
     const cfg = window.FIREBASE_CONFIG;
     if (!cfg || !cfg.apiKey || cfg.apiKey.startsWith('AIzaXXX')) {
       console.info('[Kelimoli] Firebase config eklenmemiş — local-only modda.');
@@ -52,14 +58,23 @@ const Cloud = (() => {
       // uygulama/WebView kapanınca kullanıcı düşüyor. browserLocalPersistence
       // IndexedDB kullanır, app kapansa veya cihaz yeniden başlasa bile korunur.
       // setPersistence çağrısı onAuthStateChanged kurulumundan ÖNCE bitmeli.
+      // 5sn timeout — bu çağrı diğerleri gibi (signIn/signUp/signInAnonymously)
+      // hang koruması olmadan tek kalmıştı: iOS WKWebView'da bazı ağ koşullarında
+      // hiç resolve/reject olmadan asılı kalabiliyor, bu da Cloud.init()'i ve
+      // dolayısıyla _ready=true'yu sonsuza dek bloke ediyordu ("Sunucuya
+      // bağlanılamadı" hatası 15sn retry'dan SONRA bile devam ediyordu).
+      const withPersistTimeout = (p) => Promise.race([
+        p,
+        new Promise((_, reject) => setTimeout(() => reject(new Error('setPersistence timeout')), 5000))
+      ]);
       try {
-        await authMod.setPersistence(_auth, authMod.browserLocalPersistence);
+        await withPersistTimeout(authMod.setPersistence(_auth, authMod.browserLocalPersistence));
       } catch (e) {
         // indexedLocalPersistence (Capacitor WebView için daha sağlam) fallback
         try {
-          await authMod.setPersistence(_auth, authMod.indexedDBLocalPersistence);
+          await withPersistTimeout(authMod.setPersistence(_auth, authMod.indexedDBLocalPersistence));
         } catch (e2) {
-          console.warn('[Kelimoli] Auth persistence ayarlanamadı (sessizce devam):', e.code || e.message);
+          console.warn('[Kelimoli] Auth persistence ayarlanamadı (sessizce devam):', e.code || e.message || e2.message);
         }
       }
 
@@ -129,7 +144,12 @@ const Cloud = (() => {
       console.error('[Kelimoli] Firebase init başarısız:', e);
       return false;
     }
-    })();
+      })(),
+      new Promise((resolve) => setTimeout(() => {
+        console.warn('[Kelimoli] Cloud.init() 12sn içinde tamamlanmadı — local-only modda devam.');
+        resolve(false);
+      }, 12000)),
+    ]);
     const result = await _initPromise;
     if (!result) _initPromise = null;   // başarısızsa retry yapılabilsin
     return result;
