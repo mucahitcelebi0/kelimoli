@@ -1313,6 +1313,16 @@ function showScreen(name) {
   const hideNav = ['movie', 'onboarding', 'listen', 'false-friends', 'stories-menu', 'story', 'leaderboard', 'paywall'];
   const navVisible = !hideNav.includes(name);
   bottomNav.style.display = navVisible ? 'flex' : 'none';
+  // Nav'ın gerçek yüksekliğini CSS değişkenine yaz — screen-quiz / screen-mistakes
+  // `height: calc(100% - var(--bottom-nav-h))` ile bunu okuyor, böylece footer butonu
+  // (Cevabı Kontrol Et) cihazın safe-area inset'ine göre nav'a yapışmadan oturuyor.
+  if (navVisible) {
+    // Nav yüksekliği + flex/padding kaynaklı ~6px üst offset için tampon → footer
+    // alt-nav'la çakışmasın. Boşluk safe-area inset (iPhone home indicator) için
+    // de yedek payı bırakıyor.
+    const h = bottomNav.offsetHeight + 16;
+    if (h > 0) document.documentElement.style.setProperty('--bottom-nav-h', `${h}px`);
+  }
 
   // Banner reklam — alt nav görünen ekranlarda göster, tam ekran oyunlarda gizle
   // (Premium kullanıcıda hiç gösterilmez — syncBanner içinde kontrol edilir)
