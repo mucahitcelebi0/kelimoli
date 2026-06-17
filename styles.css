@@ -2422,14 +2422,8 @@ html[data-theme="dark"] .ad-label-pill {
 @media (max-width: 440px) {
   .device-frame {
     width: 100%;
-    /* iPhone X+ alt safe area (home indicator ~34pt) için yer aç. viewport-fit=cover
-       viewport'u ekranın altına kadar yayar; .device-frame yüksekliğini buna göre
-       küçültüyoruz ki tüm içerik (footer butonları, bottom-nav) home indicator'ın
-       ÜSTÜNDE çizilsin. body padding çözmüyor — bottom-nav position:absolute;
-       bottom:0 padding'i atlatıyordu, frame'in kendisini küçültmek tek doğru yol.
-       Desktop'ta env() = 0 → eski davranış aynen korunur. */
-    height: calc(100vh - env(safe-area-inset-bottom));
-    max-height: calc(100vh - env(safe-area-inset-bottom));
+    height: 100vh;
+    max-height: 100vh;
     border-radius: 0;
     padding: 0;
     box-shadow: none;
@@ -2450,17 +2444,37 @@ html[data-theme="dark"] .ad-label-pill {
   .status-bar { display: none; }
   /* iOS WKWebView rubber-band fix: html/body'i tamamen kilitle ki sayfa scroll
      sınırına gelince (üst/alt) parmak çekmeye devam edilince TÜM kabuk (üst bar,
-     alt nav) görünür alanda sıçramasın. Tek kayan alan .screens/.onb-body/
-     .lesson-body — onlarda zaten overflow-y:auto + overscroll-behavior var. */
+     alt nav) görünür alanda sıçramasın. */
   html, body { position: fixed; overflow: hidden; width: 100%; height: 100%; }
 }
 /* Capacitor native uygulamada — viewport genişliğinden bağımsız — her zaman gizle/kilitle. */
 html.cap-native .status-bar { display: none; }
 html.cap-native, html.cap-native body { position: fixed; overflow: hidden; width: 100%; height: 100%; }
 html.cap-native body { display: block; min-height: 0; padding: 0; }
-html.cap-native .device-frame {
-  height: calc(100vh - env(safe-area-inset-bottom));
-  max-height: calc(100vh - env(safe-area-inset-bottom));
+
+/* ============== HOME INDICATOR SAFE AREA ==============
+   iPhone X+ alt 34pt'lik home indicator alanı için her bottom-edge element'ine
+   açıkça padding ekle. .device-frame height'ını küçültme yöntemi Capacitor
+   WKWebView'da env(safe-area-inset-bottom) 0 dönerken işe yaramadı (1.0.3'te
+   "Hadi başlayalım" hâlâ home indicator altında kalıyordu). Formül:
+   `eski padding + max(env, 34px)` → env çalışıyorsa onu, çalışmıyorsa
+   sabit 34pt kullan. iPhone SE (home indicator'sız) cap-native olduğu için
+   ekstra 34pt boşluk alır — fazla ama yıkıcı değil; trade-off kabul. */
+html.cap-native .onb-step {
+  padding-bottom: calc(22px + max(env(safe-area-inset-bottom), 34px));
+}
+html.cap-native .bottom-nav {
+  padding-bottom: calc(22px + max(env(safe-area-inset-bottom), 34px));
+}
+html.cap-native .lesson-footer,
+html.cap-native .ff-footer,
+html.cap-native .listen-footer,
+html.cap-native .story-footer,
+html.cap-native .paywall-footer {
+  padding-bottom: calc(14px + max(env(safe-area-inset-bottom), 34px));
+}
+html.cap-native .movie-footer {
+  padding-bottom: calc(24px + max(env(safe-area-inset-bottom), 34px));
 }
 
 /* ========================= HATA DEFTERİ ========================= */
