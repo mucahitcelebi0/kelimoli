@@ -3099,7 +3099,9 @@ function renderMovie() {
   const ph = $('#videoPlaceholder');
   const errBox = $('#videoError');
   destroyYtPlayer();
-  ph.classList.add('hidden');
+  // Placeholder'ı hemen saklamıyoruz: YT API yüklenene kadar kullanıcı siyah
+  // bir ekran yerine placeholder'ı görsün. playScene() API hazır olunca gizler.
+  ph.classList.remove('hidden');
   errBox.classList.add('hidden');
 
   // Poster sahnesi: tıklayınca YouTube açılır
@@ -3175,19 +3177,31 @@ function destroyYtPlayer() {
 
 let scenePollHandle = null;
 
-function playScene(s) {
+function playScene(s, retries) {
+  retries = retries === undefined ? 0 : retries;
   const errBox = $('#videoError');
   const playerEl = $('#ytPlayer');
 
-  errBox.classList.add('hidden');
-  if (playerEl) playerEl.classList.remove('hidden');
-
   // YT.Player'ın varlığı asıl kriter — ytApiReady flag'ı kaçırılmış olabilir.
+  // Retry sırasında playerEl'i GÖSTERME: boş/siyah div yerine placeholder görünsün.
   if (!window.YT || !window.YT.Player) {
-    setTimeout(() => playScene(s), 500);
+    if (retries >= 30) {
+      // 15 saniye (~30 × 500ms) sonra hâlâ yüklenmediyse hata ekranına geç.
+      const ph = $('#videoPlaceholder');
+      if (ph) ph.classList.add('hidden');
+      showVideoError(s);
+      return;
+    }
+    setTimeout(() => playScene(s, retries + 1), 500);
     return;
   }
   ytApiReady = true; // Buraya gelinmişse API hazır.
+
+  // API hazır — placeholder'ı gizle, player div'ini göster.
+  const ph = $('#videoPlaceholder');
+  if (ph) ph.classList.add('hidden');
+  errBox.classList.add('hidden');
+  if (playerEl) playerEl.classList.remove('hidden');
 
   const videoId = (s.videoId && s.videoId.trim()) || '';
   if (!videoId) {
