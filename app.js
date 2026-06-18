@@ -3154,11 +3154,21 @@ function renderMovie() {
 // YouTube IFrame Player API
 let ytPlayer = null;
 let ytApiReady = false;
-// API'nin "ready" callback'i kaçırılabilir (script app.js'ten önce yüklenmişse callback
-// tanımlanmadan çağrılır). Bu yüzden hem callback'i kuruyoruz hem de YT.Player zaten
-// erişilebiliyorsa flag'i hemen true yapıyoruz — iki yönden de güvenli.
+let _ytScriptLoading = false;
+// Callback önceden tanımlanıyor — script yüklenince bu çağrılır.
 window.onYouTubeIframeAPIReady = function() { ytApiReady = true; };
 if (window.YT && window.YT.Player) ytApiReady = true;
+
+// YouTube API'yi ihtiyaç anında yükle (Cinema Sahnesi açılınca).
+// Başlangıçta <head>'de yüklersek: callback henüz tanımlı değil → Script error. :0
+// Lazy yüklersek: callback ÖNCE tanımlanmış olur → güvenli.
+function loadYouTubeAPI() {
+  if (ytApiReady || _ytScriptLoading) return;
+  _ytScriptLoading = true;
+  const sc = document.createElement('script');
+  sc.src = 'https://www.youtube.com/iframe_api';
+  document.head.appendChild(sc);
+}
 
 function destroyYtPlayer() {
   if (ytPlayer) {
@@ -3185,6 +3195,7 @@ function playScene(s, retries) {
   // YT.Player'ın varlığı asıl kriter — ytApiReady flag'ı kaçırılmış olabilir.
   // Retry sırasında playerEl'i GÖSTERME: boş/siyah div yerine placeholder görünsün.
   if (!window.YT || !window.YT.Player) {
+    if (retries === 0) loadYouTubeAPI(); // ilk denemede script'i yükle
     if (retries >= 30) {
       // 15 saniye (~30 × 500ms) sonra hâlâ yüklenmediyse hata ekranına geç.
       const ph = $('#videoPlaceholder');
