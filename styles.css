@@ -2464,7 +2464,9 @@ html.cap-native .onb-step {
   padding-bottom: calc(22px + max(env(safe-area-inset-bottom), 34px));
 }
 html.cap-native .bottom-nav {
-  bottom: max(env(safe-area-inset-bottom), 34px);
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  padding-bottom: calc(22px + max(env(safe-area-inset-bottom), 34px));
 }
 html.cap-native .lesson-footer,
 html.cap-native .ff-footer,
