@@ -4,9 +4,17 @@ on:
   workflow_dispatch:
     inputs:
       build_number:
-        description: 'Build number (örn: 4)'
+        description: 'Build number (örn: 14)'
         required: true
         default: '4'
+      distribution_type:
+        description: 'Dağıtım tipi: appstore veya adhoc'
+        required: true
+        default: 'appstore'
+        type: choice
+        options:
+          - appstore
+          - adhoc
   push:
     tags: ['ios-v*']
 
@@ -75,7 +83,8 @@ jobs:
           rm /tmp/cert.p12
           echo "KEYCHAIN_PATH=$KEYCHAIN_PATH" >> $GITHUB_ENV
 
-      - name: Install provisioning profile
+      - name: Install provisioning profile (App Store)
+        if: ${{ github.event.inputs.distribution_type != 'adhoc' }}
         env:
           PROFILE_B64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
         run: |
@@ -83,7 +92,17 @@ jobs:
           mkdir -p "$PROFILES_DIR"
           echo "$PROFILE_B64" | base64 --decode > "$PROFILES_DIR/Kelimoli.mobileprovision"
 
-      - name: Create ExportOptions.plist
+      - name: Install provisioning profile (Ad Hoc)
+        if: ${{ github.event.inputs.distribution_type == 'adhoc' }}
+        env:
+          PROFILE_B64: ${{ secrets.IOS_ADHOC_PROFILE_BASE64 }}
+        run: |
+          PROFILES_DIR=~/Library/MobileDevice/Provisioning\ Profiles
+          mkdir -p "$PROFILES_DIR"
+          echo "$PROFILE_B64" | base64 --decode > "$PROFILES_DIR/Kelimoli.mobileprovision"
+
+      - name: Create ExportOptions.plist (App Store)
+        if: ${{ github.event.inputs.distribution_type != 'adhoc' }}
         run: |
           cat > ios/App/ExportOptions.plist << 'PLISTEOF'
           <?xml version="1.0" encoding="UTF-8"?>
@@ -104,15 +123,37 @@ jobs:
           </plist>
           PLISTEOF
 
+      - name: Create ExportOptions.plist (Ad Hoc)
+        if: ${{ github.event.inputs.distribution_type == 'adhoc' }}
+        run: |
+          cat > ios/App/ExportOptions.plist << 'PLISTEOF'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key><string>ad-hoc</string>
+            <key>teamID</key><string>26TL3S2A25</string>
+            <key>signingStyle</key><string>manual</string>
+            <key>provisioningProfiles</key>
+            <dict>
+              <key>com.kelimoli.app</key><string>Kelimoli Ad Hoc</string>
+            </dict>
+            <key>stripSwiftSymbols</key><true/>
+            <key>uploadBitcode</key><false/>
+          </dict>
+          </plist>
+          PLISTEOF
+
       - name: Archive
         run: |
+          PROFILE_NAME="${{ github.event.inputs.distribution_type == 'adhoc' && 'Kelimoli Ad Hoc' || 'Kelimoli App Store' }}"
           cd ios/App
           xcodebuild -workspace App.xcworkspace -scheme App \
             -configuration Release -destination 'generic/platform=iOS' \
             -archivePath build/App.xcarchive \
             CODE_SIGN_STYLE=Manual \
             DEVELOPMENT_TEAM=26TL3S2A25 \
-            PROVISIONING_PROFILE_SPECIFIER="Kelimoli App Store" \
+            PROVISIONING_PROFILE_SPECIFIER="$PROFILE_NAME" \
             OTHER_CODE_SIGN_FLAGS="--keychain $KEYCHAIN_PATH" \
             archive
 
@@ -124,7 +165,16 @@ jobs:
             -exportOptionsPlist ExportOptions.plist \
             -exportPath build/
 
-      - name: Setup API Key
+      - name: Upload IPA as artifact (Ad Hoc)
+        if: ${{ github.event.inputs.distribution_type == 'adhoc' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: Kelimoli-AdHoc-${{ github.event.inputs.build_number }}
+          path: ios/App/build/*.ipa
+          retention-days: 7
+
+      - name: Setup API Key (App Store)
+        if: ${{ github.event.inputs.distribution_type != 'adhoc' }}
         env:
           API_KEY_B64: ${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
           KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
@@ -133,7 +183,8 @@ jobs:
           echo "$API_KEY_B64" | base64 --decode > \
             ~/.appstoreconnect/private_keys/AuthKey_${KEY_ID}.p8
 
-      - name: Upload to TestFlight
+      - name: Upload to TestFlight (App Store)
+        if: ${{ github.event.inputs.distribution_type != 'adhoc' }}
         env:
           KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
           ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
