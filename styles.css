@@ -2476,6 +2476,9 @@ html.cap-native .paywall-footer {
 html.cap-native .movie-footer {
   padding-bottom: calc(24px + max(env(safe-area-inset-bottom), 34px));
 }
+html.cap-native .result-overlay {
+  padding-bottom: calc(32px + max(env(safe-area-inset-bottom), 34px));
+}
 
 /* ========================= HATA DEFTERİ ========================= */
 .screen-mistakes { padding: 0; }
