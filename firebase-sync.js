@@ -121,24 +121,18 @@ const Cloud = (() => {
         _listeners.forEach(fn => { try { fn(user); } catch (e) {} });
       });
 
-      // İlk açılışta anonim olarak giriş yap (kullanıcı zaten giriş yapmamışsa)
-      // KRİTİK: 5sn timeout — Apple Review reject 12 Haz 2026.
-      // iPadOS 26.5 + restricted network'te signInAnonymously hang olursa
-      // _ready=true ASLA çağrılmaz, login modal'ı "Bağlanılıyor..."'da takılı kalır.
-      // Timeout ile hata sessiz log, _ready=true devam → kullanıcı email/password ile
-      // denerse explicit network error mesajı görür.
-      if (!_auth.currentUser) {
-        try {
-          await Promise.race([
-            authMod.signInAnonymously(_auth),
-            new Promise((resolve) => setTimeout(() => resolve(null), 5000))
-          ]);
-        } catch (e) {
-          console.warn('[Kelimoli] Anonim giriş başarısız:', e.code || e.message);
-        }
-      }
-
+      // _ready burada set edilir — signInAnonymously ağ çağrısı ÖNCE değil.
+      // Sebep: setPersistence (2×5sn) + signInAnonymously (5sn) = 15sn >
+      // outer 12sn timeout → _ready asla true olmuyordu. Anonim giriş
+      // fire-and-forget olarak arka planda devam eder; email/password login
+      // etkilenmez çünkü _auth zaten hazır.
       _ready = true;
+
+      if (!_auth.currentUser) {
+        authMod.signInAnonymously(_auth).catch(e => {
+          console.warn('[Kelimoli] Anonim giriş başarısız:', e.code || e.message);
+        });
+      }
       return true;
     } catch (e) {
       console.error('[Kelimoli] Firebase init başarısız:', e);
