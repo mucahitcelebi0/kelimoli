@@ -2461,7 +2461,7 @@ html.cap-native body { display: block; min-height: 0; padding: 0; }
    sabit 34pt kullan. iPhone SE (home indicator'sız) cap-native olduğu için
    ekstra 34pt boşluk alır — fazla ama yıkıcı değil; trade-off kabul. */
 html.cap-native .onb-step {
-  padding-bottom: calc(22px + max(env(safe-area-inset-bottom), 34px));
+  padding-bottom: calc(22px + max(env(safe-area-inset-bottom), 54px));
 }
 html.cap-native .bottom-nav {
   position: fixed;
@@ -2473,13 +2473,13 @@ html.cap-native .ff-footer,
 html.cap-native .listen-footer,
 html.cap-native .story-footer,
 html.cap-native .paywall-footer {
-  padding-bottom: calc(14px + max(env(safe-area-inset-bottom), 34px));
+  padding-bottom: calc(14px + max(env(safe-area-inset-bottom), 54px));
 }
 html.cap-native .movie-footer {
-  padding-bottom: calc(24px + max(env(safe-area-inset-bottom), 34px));
+  padding-bottom: calc(24px + max(env(safe-area-inset-bottom), 54px));
 }
 html.cap-native .result-overlay {
-  padding-bottom: calc(32px + max(env(safe-area-inset-bottom), 34px));
+  padding-bottom: calc(32px + max(env(safe-area-inset-bottom), 54px));
 }
 
 /* ========================= HATA DEFTERİ ========================= */

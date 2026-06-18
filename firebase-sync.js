@@ -119,7 +119,7 @@ const Cloud = (() => {
     }
       })(),
       new Promise((resolve) => setTimeout(() => {
-        console.warn('[Kelimoli] Cloud.init() 12sn içinde tamamlanmadı — local-only modda devam.');
+        if (!_ready) console.warn('[Kelimoli] Cloud.init() 12sn içinde tamamlanmadı — local-only modda devam.');
         resolve(false);
       }, 12000)),
     ]);
