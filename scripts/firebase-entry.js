@@ -5,6 +5,8 @@
 import { initializeApp } from 'firebase/app';
 import {
   getAuth,
+  initializeAuth,
+  inMemoryPersistence,
   setPersistence,
   browserLocalPersistence,
   indexedDBLocalPersistence,
@@ -22,6 +24,7 @@ import {
   initializeFirestore,
   persistentLocalCache,
   persistentSingleTabManager,
+  memoryLocalCache,
   doc,
   getDoc,
   setDoc,
@@ -40,6 +43,8 @@ window.FirebaseBundle = {
   initializeApp,
   authMod: {
     getAuth,
+    initializeAuth,
+    inMemoryPersistence,
     setPersistence,
     browserLocalPersistence,
     indexedDBLocalPersistence,
@@ -57,6 +62,7 @@ window.FirebaseBundle = {
     initializeFirestore,
     persistentLocalCache,
     persistentSingleTabManager,
+    memoryLocalCache,
     doc,
     getDoc,
     setDoc,

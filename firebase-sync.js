@@ -52,46 +52,22 @@ const Cloud = (() => {
       const { initializeApp, authMod, firestoreMod, analyticsMod } = window.FirebaseBundle;
 
       _app = initializeApp(cfg);
-      _auth = authMod.getAuth(_app);
+      // iOS WKWebView'da IndexedDB güvenilmez şekilde takılıyor: hem Auth token
+      // yazımı (signIn sonrası) hem Firestore cache yazımı asılı kalıyor ve hiç
+      // resolve/reject etmiyor. initializeAuth+inMemoryPersistence ile IndexedDB'yi
+      // tamamen devre dışı bırakıyoruz — token bellekte tutulur, uygulama tamamen
+      // kapatılınca oturum sona erer (arka plan/ön plan geçişi etkilenmez).
+      _auth = authMod.initializeAuth(_app, {
+        persistence: authMod.inMemoryPersistence,
+      });
 
-      // KRİTİK: Auth persistence'ı LOCAL (kalıcı) yap. Varsayılan SESSION'da
-      // uygulama/WebView kapanınca kullanıcı düşüyor. browserLocalPersistence
-      // IndexedDB kullanır, app kapansa veya cihaz yeniden başlasa bile korunur.
-      // setPersistence çağrısı onAuthStateChanged kurulumundan ÖNCE bitmeli.
-      // 5sn timeout — bu çağrı diğerleri gibi (signIn/signUp/signInAnonymously)
-      // hang koruması olmadan tek kalmıştı: iOS WKWebView'da bazı ağ koşullarında
-      // hiç resolve/reject olmadan asılı kalabiliyor, bu da Cloud.init()'i ve
-      // dolayısıyla _ready=true'yu sonsuza dek bloke ediyordu ("Sunucuya
-      // bağlanılamadı" hatası 15sn retry'dan SONRA bile devam ediyordu).
-      // 1.5sn timeout — debug'da her iki deneme de 5sn bekliyordu (5+5=10sn),
-      // outer 12sn timeout'tan önce _ready=true'ya ulaşılamıyordu. 1.5sn ile
-      // toplam < 4sn, 12sn window'u rahatça geçiyoruz.
-      const withPersistTimeout = (p) => Promise.race([
-        p,
-        new Promise((_, reject) => setTimeout(() => reject(new Error('setPersistence timeout')), 1500))
-      ]);
-      try {
-        await withPersistTimeout(authMod.setPersistence(_auth, authMod.browserLocalPersistence));
-      } catch (e) {
-        // indexedLocalPersistence (Capacitor WebView için daha sağlam) fallback
-        try {
-          await withPersistTimeout(authMod.setPersistence(_auth, authMod.indexedDBLocalPersistence));
-        } catch (e2) {
-          console.warn('[Kelimoli] Auth persistence ayarlanamadı (sessizce devam):', e.code || e.message || e2.message);
-        }
-      }
-
-      // Offline persistence: kullanıcı internetsizken bile son state'i görür,
-      // bağlantı dönünce otomatik sync olur. initializeFirestore getFirestore'dan
-      // ÖNCE çağrılmalı. Capacitor tek WebView olduğundan SingleTabManager yeterli.
+      // Firestore için de memory cache — persistentLocalCache IndexedDB kullandığından
+      // aynı soruya yol açıyordu (profil ekranı açılmıyor / sonsuz yükleme).
       try {
         _db = firestoreMod.initializeFirestore(_app, {
-          localCache: firestoreMod.persistentLocalCache({
-            tabManager: firestoreMod.persistentSingleTabManager(),
-          }),
+          localCache: firestoreMod.memoryLocalCache(),
         });
       } catch (e) {
-        // Bazı senaryolarda initializeFirestore tekrar çağrılırsa atar — fallback
         _db = firestoreMod.getFirestore(_app);
       }
       _fb   = { authMod, firestoreMod };
