@@ -5208,3 +5208,67 @@ if ('serviceWorker' in navigator && !_isCapacitorNative && !_isLocalhost && loca
       });
   });
 }
+
+// =====================================================================
+// DEBUG PANEL — sağ-alt köşeye 5 kez dokunarak açılır
+// =====================================================================
+(function () {
+  const logs = [];
+  const _ce = console.error.bind(console);
+  const _cw = console.warn.bind(console);
+  function cap(type, args) {
+    const msg = Array.from(args).map(a => { try { return typeof a === 'object' ? JSON.stringify(a) : String(a); } catch (e) { return String(a); } }).join(' ');
+    logs.unshift({ type, msg, t: new Date().toLocaleTimeString() });
+    if (logs.length > 40) logs.pop();
+  }
+  console.error = function (...a) { cap('ERR', a); _ce(...a); };
+  console.warn  = function (...a) { cap('WARN', a); _cw(...a); };
+  window.addEventListener('error', e => cap('ERR', [e.message, e.filename + ':' + e.lineno]));
+  window.addEventListener('unhandledrejection', e => cap('REJ', [String(e.reason)]));
+
+  let taps = 0, timer = null;
+  document.addEventListener('touchstart', e => {
+    const t = e.touches[0];
+    if (t.clientX > window.innerWidth - 90 && t.clientY > window.innerHeight - 90) {
+      taps++;
+      clearTimeout(timer);
+      timer = setTimeout(() => { taps = 0; }, 1800);
+      if (taps >= 5) { taps = 0; toggle(); }
+    }
+  }, { passive: true });
+
+  function toggle() {
+    const old = document.getElementById('_kdbg');
+    if (old) { old.remove(); return; }
+    const cap = window.Capacitor;
+    const native = cap ? (typeof cap.isNativePlatform === 'function' ? cap.isNativePlatform() : !!cap.isNative) : false;
+    const te = document.createElement('div');
+    te.style.cssText = 'position:fixed;bottom:0;height:env(safe-area-inset-bottom,0px);width:1px;visibility:hidden;';
+    document.body.appendChild(te);
+    const sa = te.offsetHeight;
+    te.remove();
+    const lines = [
+      'KELIMOLI DEBUG  ' + new Date().toLocaleString(),
+      '',
+      'Capacitor       : ' + (cap ? 'VAR' : 'YOK'),
+      'isNativePlatform: ' + native,
+      'cap-native class: ' + document.documentElement.classList.contains('cap-native'),
+      'getPlatform     : ' + (cap && cap.getPlatform ? cap.getPlatform() : 'web'),
+      'safe-area-bottom: ' + sa + 'px',
+      'userAgent       : ' + navigator.userAgent.substring(0, 80),
+      '',
+      '--- LOGLAR ---',
+      ...logs.map(l => '[' + l.t + '][' + l.type + '] ' + l.msg.substring(0, 150)),
+    ].join('\n');
+    const p = document.createElement('div');
+    p.id = '_kdbg';
+    p.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.93);color:#0f0;font:11px/1.4 monospace;padding:12px;overflow-y:auto;z-index:999999;white-space:pre-wrap;word-break:break-all;';
+    const btn = document.createElement('button');
+    btn.textContent = '✕ KAPAT';
+    btn.style.cssText = 'display:block;width:100%;padding:10px;background:#222;color:#fff;border:1px solid #555;font-size:14px;margin-bottom:10px;cursor:pointer;';
+    btn.onclick = () => p.remove();
+    p.appendChild(btn);
+    p.appendChild(document.createTextNode(lines));
+    document.body.appendChild(p);
+  }
+})();
