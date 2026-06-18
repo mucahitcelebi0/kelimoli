@@ -21,7 +21,10 @@
       "*.google.com",
       "*.cloudfunctions.net",
       "kelimoli.firebaseapp.com",
-      "kelimoli.firebasestorage.app"
+      "kelimoli.firebasestorage.app",
+      "*.youtube.com",
+      "*.youtube-nocookie.com",
+      "*.ytimg.com"
     ]
   }
 }
