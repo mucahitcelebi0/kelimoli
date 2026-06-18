@@ -3214,6 +3214,7 @@ function playScene(s, retries) {
       videoId: videoId,
       playerVars: {
         autoplay: 1,
+        mute: 1,
         start: s.start || 0,
         end: s.end || undefined,
         rel: 0,
