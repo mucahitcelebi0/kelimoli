@@ -63,9 +63,12 @@ const Cloud = (() => {
       // hiç resolve/reject olmadan asılı kalabiliyor, bu da Cloud.init()'i ve
       // dolayısıyla _ready=true'yu sonsuza dek bloke ediyordu ("Sunucuya
       // bağlanılamadı" hatası 15sn retry'dan SONRA bile devam ediyordu).
+      // 1.5sn timeout — debug'da her iki deneme de 5sn bekliyordu (5+5=10sn),
+      // outer 12sn timeout'tan önce _ready=true'ya ulaşılamıyordu. 1.5sn ile
+      // toplam < 4sn, 12sn window'u rahatça geçiyoruz.
       const withPersistTimeout = (p) => Promise.race([
         p,
-        new Promise((_, reject) => setTimeout(() => reject(new Error('setPersistence timeout')), 5000))
+        new Promise((_, reject) => setTimeout(() => reject(new Error('setPersistence timeout')), 1500))
       ]);
       try {
         await withPersistTimeout(authMod.setPersistence(_auth, authMod.browserLocalPersistence));
