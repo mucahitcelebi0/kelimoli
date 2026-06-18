@@ -2460,8 +2460,8 @@ html.cap-native body { display: block; min-height: 0; padding: 0; }
    `eski padding + max(env, 34px)` → env çalışıyorsa onu, çalışmıyorsa
    sabit 34pt kullan. iPhone SE (home indicator'sız) cap-native olduğu için
    ekstra 34pt boşluk alır — fazla ama yıkıcı değil; trade-off kabul. */
-html.cap-native .onb-step {
-  padding-bottom: calc(22px + max(env(safe-area-inset-bottom), 54px));
+html.cap-native .onb-footer {
+  padding-bottom: max(env(safe-area-inset-bottom), 34px);
 }
 html.cap-native .bottom-nav {
   position: fixed;
