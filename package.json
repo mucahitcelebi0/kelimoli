@@ -4,11 +4,15 @@
   "private": true,
   "description": "Kelimoli — İngilizce Kelime Akademisi (Türkçe→İngilizce öğrenme uygulaması)",
   "scripts": {
+    "postinstall": "node scripts/patch-admob.js",
     "build:firebase": "node scripts/build-firebase.js",
     "sync:web": "npm run build:firebase && node scripts/sync-web.js",
     "cap:copy": "npm run sync:web && cap copy android",
     "cap:open": "cap open android",
-    "android": "npm run cap:copy && npm run cap:open"
+    "android": "npm run cap:copy && npm run cap:open",
+    "cap:copy:ios": "npm run sync:web && cap copy ios",
+    "cap:open:ios": "cap open ios",
+    "ios": "npm run cap:copy:ios && npm run cap:open:ios"
   },
   "dependencies": {
     "@capacitor-community/admob": "^6.2.0",

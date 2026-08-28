@@ -39,15 +39,12 @@ jobs:
       - name: Install npm deps
         run: npm ci
 
-      - name: Patch AdMob ConsentExecutor (UMP 3.x fix)
-        run: |
-          cp patches/ConsentExecutor.swift \
-            node_modules/@capacitor-community/admob/ios/Sources/AdMobPlugin/Consent/ConsentExecutor.swift
-
-      - name: Patch AdMob requestTrackingAuthorization main-thread fix (Apple App Review)
-        run: |
-          cp patches/AdMobPlugin.swift \
-            node_modules/@capacitor-community/admob/ios/Sources/AdMobPlugin/AdMobPlugin.swift
+      # AdMob yamaları (UMP 3.x uyumu + requestTrackingAuthorization ana-thread
+      # düzeltmesi) `npm ci` sırasında postinstall ile zaten uygulanır. Bu adım
+      # yalnızca doğrulama — yama düşerse build'in ileride Swift hatasıyla değil
+      # burada, anlaşılır şekilde durmasını istiyoruz.
+      - name: Verify AdMob patches applied
+        run: node scripts/patch-admob.js
 
       - name: Sync web → iOS
         run: |
