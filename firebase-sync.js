@@ -398,7 +398,15 @@ const Cloud = (() => {
       store.streak       = Math.max(store.streak || 0, remote.streak || 0);
       store.totalCorrect = Math.max(store.totalCorrect || 0, remote.totalCorrect || 0);
       store.totalAnswered= Math.max(store.totalAnswered || 0, remote.totalAnswered || 0);
-      store.lastActiveDate = remote.lastActiveDate || store.lastActiveDate;
+      // lastActiveDate: DAHA YENİ olanı al — buluttakini körü körüne alma.
+      // Eski hâli (`remote.lastActiveDate || store.lastActiveDate`) buluttaki tarih
+      // daha ESKİ olsa bile yereli eziyordu ve seriyi sessizce siliyordu:
+      // kullanıcı çevrimdışı çalışır (yerel = bugün, seri 13), sync başarısız olur;
+      // bağlantı gelince pull buluttaki dünün tarihini yazar; ertesi açılışta
+      // rollDailyCounters "son aktivite ne bugün ne dün" görüp seriyi 0'lardı.
+      // ISO tarihler (YYYY-MM-DD) sözlüksel sıralandığı için sort() güvenli.
+      store.lastActiveDate = [store.lastActiveDate, remote.lastActiveDate]
+        .filter(Boolean).sort().pop() || null;
       if (remote.dailyGoal) store.dailyGoal = remote.dailyGoal;
 
       // Haftalık XP — yalnız aynı hafta ise birleştir (eski hafta taşınmasın)
