@@ -54,11 +54,14 @@ const Cloud = (() => {
       _app = initializeApp(cfg);
       // iOS WKWebView'da IndexedDB güvenilmez şekilde takılıyor: hem Auth token
       // yazımı (signIn sonrası) hem Firestore cache yazımı asılı kalıyor ve hiç
-      // resolve/reject etmiyor. initializeAuth+inMemoryPersistence ile IndexedDB'yi
-      // tamamen devre dışı bırakıyoruz — token bellekte tutulur, uygulama tamamen
-      // kapatılınca oturum sona erer (arka plan/ön plan geçişi etkilenmez).
+      // resolve/reject etmiyor. Bu yüzden indexedDBLocalPersistence kullanılamıyor.
+      //
+      // Ama browserLocalPersistence IndexedDB değil localStorage kullanır —
+      // WKWebView'da senkron ve güvenilir, uygulama tamamen kapatılsa da oturum
+      // korunur. Dizi verilince Firebase sırayla dener: localStorage erişilemezse
+      // belleğe düşer, yani eski davranış güvenlik ağı olarak duruyor.
       _auth = authMod.initializeAuth(_app, {
-        persistence: authMod.inMemoryPersistence,
+        persistence: [authMod.browserLocalPersistence, authMod.inMemoryPersistence],
       });
 
       // Firestore için de memory cache — persistentLocalCache IndexedDB kullandığından
@@ -107,11 +110,21 @@ const Cloud = (() => {
       // etkilenmez çünkü _auth zaten hazır.
       _ready = true;
 
-      if (!_auth.currentUser) {
-        authMod.signInAnonymously(_auth).catch(e => {
-          console.warn('[Kelimoli] Anonim giriş başarısız:', e.code || e.message);
-        });
-      }
+      // Kalıcı oturum localStorage'dan ASENKRON geri yüklenir — initializeAuth
+      // döndükten hemen sonra currentUser, kayıtlı oturum olsa bile henüz null
+      // olabilir. Beklemeden signInAnonymously çağırmak geri yüklenen hesapla
+      // yarışır; onAuthStateChanged'deki uid-değişti dalı da bu durumda
+      // wipeLocalProgress() çalıştırıp kullanıcının ilerlemesini SİLER.
+      // authStateReady() hidrasyonun bitmesini bekler (localStorage okuması,
+      // ağ çağrısı değil). Blok fire-and-forget: _ready'yi geciktirmiyor.
+      (async () => {
+        try { await _auth.authStateReady(); } catch (e) {}
+        if (!_auth.currentUser) {
+          authMod.signInAnonymously(_auth).catch(e => {
+            console.warn('[Kelimoli] Anonim giriş başarısız:', e.code || e.message);
+          });
+        }
+      })();
       return true;
     } catch (e) {
       console.error('[Kelimoli] Firebase init başarısız:', e);
