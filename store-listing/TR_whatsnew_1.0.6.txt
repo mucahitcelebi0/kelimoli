@@ -1,0 +1,5 @@
+Bu güncelleme iPhone deneyimini iki noktada düzeltiyor:
+
+• Artık oturumun açık kalıyor. Uygulamayı tamamen kapatıp yeniden açtığında hesabından çıkmış olmuyorsun — her seferinde yeniden giriş yapmaya gerek yok. İlerlemen, XP'n ve serin olduğu gibi duruyor.
+
+• Ekran yerleşimi düzeldi. Butonlar ve alt menü artık ana ekran çubuğunun arkasında kalmıyor, üstte çentikle çakışma yok. Ders ve quiz ekranlarındaki gereksiz boşluk da kaldırıldı — daha çok içerik görünüyor.

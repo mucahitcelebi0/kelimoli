@@ -1,0 +1,5 @@
+This update fixes two things on iPhone:
+
+• You stay signed in. Fully closing the app no longer signs you out — no more logging back in every time you return. Your progress, XP and streak stay exactly where you left them.
+
+• Layout fixes. Buttons and the bottom bar are no longer hidden behind the home indicator, and nothing collides with the notch at the top. Wasted space at the bottom of lesson and quiz screens is gone, so more content fits on screen.
