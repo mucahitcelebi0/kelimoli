@@ -28,6 +28,13 @@ const FILES = [
   'revenuecat-config.js',
 ];
 
+// Bütünüyle kopyalanacak klasörler. fonts/ gömülü woff2'leri taşır —
+// index.html artık Google Fonts'a gitmiyor, bu dosyalar www/'ye girmezse
+// uygulama yedek fontlarla (Georgia / system) açılır.
+const DIRS = [
+  'fonts',
+];
+
 function ensureDir(dir) {
   fs.mkdirSync(dir, { recursive: true });
 }
@@ -44,6 +51,24 @@ function copy(file) {
   return true;
 }
 
+function copyDir(dir) {
+  const src = path.join(ROOT, dir);
+  if (!fs.existsSync(src)) {
+    console.warn(`  ! Eksik klasör: ${dir}/ (atlandı)`);
+    return 0;
+  }
+  const dst = path.join(DEST, dir);
+  ensureDir(dst);
+  let n = 0;
+  for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
+    if (entry.isDirectory()) { n += copyDir(path.join(dir, entry.name)); continue; }
+    fs.copyFileSync(path.join(src, entry.name), path.join(dst, entry.name));
+    console.log(`  ✓ ${dir}/${entry.name}`);
+    n++;
+  }
+  return n;
+}
+
 function main() {
   ensureDir(DEST);
   let ok = 0;
@@ -53,7 +78,9 @@ function main() {
       ok++;
     }
   }
-  console.log(`\nKopyalandı: ${ok}/${FILES.length} dosya → www/`);
+  let dirFiles = 0;
+  for (const d of DIRS) dirFiles += copyDir(d);
+  console.log(`\nKopyalandı: ${ok}/${FILES.length} dosya + ${dirFiles} klasör dosyası → www/`);
 }
 
 main();

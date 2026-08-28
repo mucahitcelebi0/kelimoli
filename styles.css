@@ -4,6 +4,50 @@
    MasterClass + Apple News tarzı: serif başlıklar + sans body + altın aksan
    ===================================================================== */
 
+/* =====================================================================
+   FONTLAR — uygulamayla birlikte gömülü (fonts/), ağdan çekilmiyor.
+   Önceden index.html fonts.googleapis.com'a render-blocking istek atıyordu:
+     - her soğuk açılışta ağ bekleniyordu, çevrimdışıyken font yedeğe düşüyordu
+     - kullanıcının IP'si her açılışta Google'a gidiyordu (mağaza gizlilik
+       formlarında beyan edilmemiş bir veri aktarımı)
+   Değişken (variable) sürümler: tek dosya tüm ağırlıkları karşılıyor.
+   latin-ext ŞART — Türkçe'nin ğ (U+011F), ş (U+015F), İ (U+0130) karakterleri
+   temel latin subset'inde yok. (ı = U+0131 latin'de.)
+   unicode-range'ler Google Fonts'un kendi CSS'inden birebir alındı.
+   ===================================================================== */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 300 800;
+  font-display: swap;
+  src: url('fonts/inter-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 300 800;
+  font-display: swap;
+  src: url('fonts/inter-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: normal;
+  font-weight: 600 800;
+  font-display: swap;
+  src: url('fonts/playfair-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: normal;
+  font-weight: 600 800;
+  font-display: swap;
+  src: url('fonts/playfair-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
 :root {
   /* RENK PALETİ */
   --bg: #F6F4EE;            /* sıcak krem - göz yormaz */
@@ -252,6 +296,13 @@ html[data-theme="dark"] .story-card .game-icon.game-story {
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+/* Form elemanları font'u MİRAS ALMAZ — tarayıcının kendi varsayılanını (Arial /
+   sistem font'u) kullanırlar. Bu kural olmadan uygulamadaki 124 buton/girdinin
+   57'si Inter yerine Arial ile render ediliyordu: oyun kartları, seviye
+   seçenekleri, telaffuz ve profil düğmeleri... Sadece font-family miras alınıyor;
+   `font: inherit` boyut ve ağırlığı da ezip mevcut yerleşimi bozardı. */
+button, input, select, textarea { font-family: inherit; }
 
 /* =====================================================================
    İKON SİSTEMİ — SVG çizgi ikonları (currentColor ile renk alır)
@@ -1157,7 +1208,7 @@ body {
 .game-arrow {
   color: var(--muted);
   font-size: 26px;
-  font-weight: 300;
+  font-weight: 400;   /* fontlar gömülene kadar 300 zaten 400'e yuvarlanıyordu */
 }
 
 /* ============== AD LABEL ============== */
@@ -3652,7 +3703,7 @@ html[data-theme="dark"] .ach-more-btn { color: var(--primary); }
 .setting-arrow {
   color: var(--ink-soft);
   font-size: 22px;
-  font-weight: 300;
+  font-weight: 400;   /* fontlar gömülene kadar 300 zaten 400'e yuvarlanıyordu */
   flex-shrink: 0;
 }
 
@@ -3956,7 +4007,7 @@ html[data-theme="dark"] .ach-more-btn { color: var(--primary); }
 .story-tile-arrow {
   color: var(--ink-soft);
   font-size: 24px;
-  font-weight: 300;
+  font-weight: 400;   /* fontlar gömülene kadar 300 zaten 400'e yuvarlanıyordu */
 }
 .story-empty {
   text-align: center;

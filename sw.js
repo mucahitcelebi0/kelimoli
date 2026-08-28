@@ -2,12 +2,14 @@
 // Kelimoli — Service Worker
 // Stratejiler:
 //   - HTML (navigasyon): network-first → güncel UI almak için
-//   - Statik varlık (css/js/svg/manifest): cache-first → hızlı açılış
-//   - Google Fonts: stale-while-revalidate
+//   - Statik varlık (css/js/svg/woff2/manifest): cache-first → hızlı açılış
 //   - YouTube iframe API: passthrough (cache'lemiyoruz)
+// Not: Fontlar artık uygulamayla gömülü (fonts/*.woff2) — aynı origin'den
+// geldikleri için cache-first dalına düşerler, ayrı bir Google Fonts
+// stratejisine gerek kalmadı.
 // =====================================================================
 
-const VERSION = 'kelimoli-v76';
+const VERSION = 'kelimoli-v77';
 const STATIC_CACHE = `${VERSION}-static`;
 const RUNTIME_CACHE = `${VERSION}-runtime`;
 
@@ -25,6 +27,10 @@ const PRECACHE_URLS = [
   './firebase-bundle.js',
   './firebase-sync.js',
   './revenuecat-config.js',
+  './fonts/inter-latin.woff2',
+  './fonts/inter-latin-ext.woff2',
+  './fonts/playfair-latin.woff2',
+  './fonts/playfair-latin-ext.woff2',
 ];
 
 // ---- Install: precache ----
@@ -69,13 +75,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Google Fonts → stale-while-revalidate
-  if (url.hostname.includes('fonts.googleapis.com') || url.hostname.includes('fonts.gstatic.com')) {
-    event.respondWith(staleWhileRevalidate(req));
-    return;
-  }
-
-  // Aynı origin statik varlık → cache-first
+  // Aynı origin statik varlık (fontlar dahil) → cache-first
   if (url.origin === self.location.origin) {
     event.respondWith(cacheFirst(req));
     return;

@@ -36,9 +36,11 @@
   <meta property="og:image" content="icon.svg" />
 
   <!-- ============== FONTS + STYLES ============== -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- Fontlar artık uygulamayla gömülü (fonts/*.woff2), @font-face tanımları
+       styles.css'in başında. Google Fonts'a giden render-blocking istekler
+       kaldırıldı: çevrimdışı da aynı görünüm, ağa ve Google'a bağımlılık yok. -->
+  <link rel="preload" as="font" type="font/woff2" href="fonts/inter-latin.woff2" crossorigin />
+  <link rel="preload" as="font" type="font/woff2" href="fonts/inter-latin-ext.woff2" crossorigin />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
