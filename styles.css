@@ -2452,34 +2452,44 @@ html.cap-native .status-bar { display: none; }
 html.cap-native, html.cap-native body { position: fixed; overflow: hidden; width: 100%; height: 100%; }
 html.cap-native body { display: block; min-height: 0; padding: 0; }
 
-/* ============== HOME INDICATOR SAFE AREA ==============
-   iPhone X+ alt 34pt'lik home indicator alanı için her bottom-edge element'ine
-   açıkça padding ekle. .device-frame height'ını küçültme yöntemi Capacitor
-   WKWebView'da env(safe-area-inset-bottom) 0 dönerken işe yaramadı (1.0.3'te
-   "Hadi başlayalım" hâlâ home indicator altında kalıyordu). Formül:
-   `eski padding + max(env, 34px)` → env çalışıyorsa onu, çalışmıyorsa
-   sabit 34pt kullan. iPhone SE (home indicator'sız) cap-native olduğu için
-   ekstra 34pt boşluk alır — fazla ama yıkıcı değil; trade-off kabul. */
+/* ============== SAFE AREA ==============
+   capacitor.config.json'da ios.contentInset artık "never" — WebView tüm ekranı
+   kaplıyor ve env(safe-area-inset-*) gerçek değerleri döndürüyor. ("always"
+   iken native katman içeriği zaten içeri kaydırdığı için env 0 dönüyordu ve
+   sabit 34/54px tahminleri yazmak zorunda kalmıştık.)
+
+   iPhone 17 Pro simülatöründe ölçüldü: top 62px, bottom 34px.
+
+   Sabitler kaldırıldı: home indicator'ı olmayan cihazlarda (iPhone SE) env 0
+   döner ve artık gereksiz boşluk oluşmaz — eski `max(env, 34px)` formülü o
+   cihazlara 34pt fazladan boşluk bindiriyordu. */
+
+/* Üst: contentInset "never" ile içerik durum çubuğu / Dynamic Island altına
+   kayar. Tüm kabuğu aşağı iten tek nokta burası. */
+html.cap-native .device-frame {
+  padding-top: env(safe-area-inset-top);
+}
+
 html.cap-native .onb-footer {
-  padding-bottom: max(env(safe-area-inset-bottom), 34px);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 html.cap-native .bottom-nav {
   position: fixed;
   left: 0; right: 0; bottom: 0;
-  padding-bottom: max(env(safe-area-inset-bottom), 34px);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 html.cap-native .lesson-footer,
 html.cap-native .ff-footer,
 html.cap-native .listen-footer,
 html.cap-native .story-footer,
 html.cap-native .paywall-footer {
-  padding-bottom: calc(14px + max(env(safe-area-inset-bottom), 54px));
+  padding-bottom: calc(14px + env(safe-area-inset-bottom));
 }
 html.cap-native .movie-footer {
-  padding-bottom: calc(24px + max(env(safe-area-inset-bottom), 54px));
+  padding-bottom: calc(24px + env(safe-area-inset-bottom));
 }
 html.cap-native .result-overlay {
-  padding-bottom: calc(32px + max(env(safe-area-inset-bottom), 54px));
+  padding-bottom: calc(32px + env(safe-area-inset-bottom));
 }
 
 /* ========================= HATA DEFTERİ ========================= */
