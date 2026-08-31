@@ -1,0 +1,7 @@
+This update fixes three things:
+
+• Your streak no longer disappears. If you studied while offline, your daily streak could reset once you reconnected. That bug is fixed — offline practice now counts toward your streak.
+
+• The app looks the same without a connection. Fonts now ship inside the app, so nothing waits on the network at launch and the design holds up in airplane mode.
+
+• Consistent typography. Game cards, level options and some buttons were rendering in a different typeface; everything now matches across the app.

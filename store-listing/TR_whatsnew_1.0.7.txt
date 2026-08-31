@@ -1,0 +1,7 @@
+Bu güncelleme üç şeyi düzeltiyor:
+
+• Serin artık kaybolmuyor. İnterneti kapalıyken çalıştığında, bağlantı geri geldiğinde günlük serin sıfırlanabiliyordu. Bu hata giderildi — çevrimdışı yaptığın çalışma da seriye sayılıyor.
+
+• Uygulama internetsizken de aynı görünüyor. Yazı tipleri artık uygulamanın içinde geliyor; açılışta internet beklenmiyor ve uçak modunda görünüm bozulmuyor.
+
+• Yazı tipi tutarsızlığı giderildi. Oyun kartları, seviye seçenekleri ve bazı butonlar farklı bir yazı tipiyle görünüyordu; artık uygulamanın her yerinde aynı.
